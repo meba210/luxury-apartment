@@ -1,0 +1,213 @@
+.contact-page {}
+
+/* Header */
+.contact-page__header {
+  position: relative;
+  padding: 140px 0 60px;
+  overflow: hidden;
+}
+
+.contact-page__header-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.contact-page__header-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.3);
+}
+
+.contact-page__header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.9) 100%);
+}
+
+.contact-page__header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.contact-page__title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--white);
+  margin: 8px 0 12px;
+}
+
+.contact-page__subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.7);
+}
+
+/* Main */
+.contact-page__main {
+  background: var(--dark);
+}
+
+.contact-page__inner {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 60px;
+  align-items: start;
+}
+
+/* Info */
+.contact-page__info h2 {
+  font-size: clamp(1.2rem, 2.5vw, 1.7rem);
+  margin-top: 8px;
+}
+
+.contact-page__info > p {
+  font-size: 0.88rem;
+  line-height: 1.8;
+  margin-bottom: 28px;
+}
+
+.contact-page__details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-page__detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  background: var(--dark-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.contact-page__detail:hover {
+  border-color: rgba(201,168,76,0.35);
+}
+
+.contact-page__detail-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.contact-page__detail-title {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.contact-page__detail-line {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  line-height: 1.5;
+}
+
+a.contact-page__detail-line:hover {
+  color: var(--gold);
+}
+
+/* Form */
+.contact-page__form-wrap {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+}
+
+.contact-page__form-header {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.contact-page__form-header h3 {
+  font-size: 1.2rem;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.contact-page__form-header p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* Map */
+.contact-page__map {
+  background: var(--dark-2);
+  border-top: 1px solid var(--border);
+}
+
+.contact-page__map-inner {
+  height: 300px;
+}
+
+.contact-page__map-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--dark-3) 0%, var(--dark-4) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-page__map-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(201,168,76,0.08) 0%, transparent 70%);
+}
+
+.contact-page__map-content {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-page__map-icon {
+  font-size: 2.5rem;
+  color: var(--gold);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.contact-page__map-content h3 {
+  font-size: 1.2rem;
+  color: var(--white);
+}
+
+.contact-page__map-content p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .contact-page__inner { grid-template-columns: 1fr; gap: 36px; }
+}
+
+@media (max-width: 560px) {
+  .contact-page__form-wrap { padding: 20px; }
+}

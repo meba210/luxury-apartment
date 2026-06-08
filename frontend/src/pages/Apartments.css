@@ -1,0 +1,97 @@
+.apartments-page {}
+
+/* Header */
+.apartments-page__header {
+  position: relative;
+  padding: 140px 0 60px;
+  overflow: hidden;
+}
+
+.apartments-page__header-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.apartments-page__header-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.35);
+}
+
+.apartments-page__header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.85) 100%);
+}
+
+.apartments-page__header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.apartments-page__title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--white);
+  margin: 8px 0 12px;
+}
+
+.apartments-page__subtitle {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.7;
+}
+
+/* Content */
+.apartments-page__content {
+  background: var(--dark);
+}
+
+.apartments-page__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* States */
+.apartments-page__state {
+  text-align: center;
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.apartments-page__state-icon {
+  font-size: 3rem;
+  color: var(--gold);
+  opacity: 0.5;
+}
+
+.apartments-page__state h3 {
+  font-size: 1.3rem;
+  color: var(--white);
+}
+
+.apartments-page__state p {
+  color: var(--text-muted);
+  max-width: 360px;
+}
+
+/* Load More */
+.apartments-page__load-more {
+  text-align: center;
+  margin-top: 48px;
+}
+
+@media (max-width: 1024px) {
+  .apartments-page__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .apartments-page__grid { grid-template-columns: 1fr; }
+  .apartments-page__header { padding: 120px 0 40px; }
+}
