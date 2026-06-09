@@ -18,7 +18,10 @@ export default function PartnerLogin() {
     setError('')
     setLoading(true)
     try {
-      const res = await axios.post('/api/partners/login', form)
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/partners/login`,
+        form
+      );
       localStorage.setItem('partner_token', res.data.token)
       localStorage.setItem('partner_info', JSON.stringify(res.data.partner))
       navigate('/partner/dashboard')

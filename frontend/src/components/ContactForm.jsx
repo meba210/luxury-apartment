@@ -27,7 +27,7 @@ export default function ContactForm({ apartments = [], preselectedId = null, pre
     setStatus('loading')
     setError('')
     try {
-      await axios.post('/api/inquiries', form)
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/inquiries`, form)
       setStatus('success')
       setForm({ full_name: '', email: '', phone: '', apartment_id: '', message: '' })
     } catch {

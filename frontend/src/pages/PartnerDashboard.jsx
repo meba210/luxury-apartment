@@ -62,9 +62,12 @@ export default function PartnerDashboard() {
       params.set('sort', sortCol)
       params.set('order', sortDir)
 
-      const res = await axios.get(`/api/partners/sales?${params}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/partners/sales?${params}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setSales(res.data.data || [])
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {

@@ -101,9 +101,9 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([
-      axios.get('/api/apartments?featured=true'),
-      axios.get('/api/apartments'),
-      axios.get('/api/ratings'),
+      axios.get(`${import.meta.env.VITE_API_URL}/api/apartments?featured=true`),
+      axios.get(`${import.meta.env.VITE_API_URL}/api/apartments`),
+      axios.get(`${import.meta.env.VITE_API_URL}/api/ratings`),
     ])
       .then(([featRes, allRes, ratingRes]) => {
         const apartments = allRes.data.data || [];
@@ -149,14 +149,16 @@ export default function Home() {
 
     try {
       setRatingSubmitting(true);
-      await axios.post('/api/ratings', {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/ratings`, {
         apartment_id: Number(ratingForm.apartment_id),
         name: ratingForm.name.trim(),
         stars: Number(ratingForm.stars),
         comment: ratingForm.comment.trim(),
       });
 
-      const ratingRes = await axios.get('/api/ratings');
+      const ratingRes = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/ratings`
+      );
       setRatings(ratingRes.data.data || []);
       setRatingForm({
         ...initialRatingForm,

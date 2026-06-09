@@ -34,7 +34,9 @@ export default function Apartments() {
       if (f.location_id) params.set('location_id', f.location_id)
       if (f.min_price) params.set('min_price', f.min_price)
       if (f.max_price) params.set('max_price', f.max_price)
-      const res = await axios.get(`/api/apartments?${params.toString()}`)
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/apartments?${params.toString()}`
+      );
       setApartments(res.data.data || [])
       setPage(1)
     } catch {

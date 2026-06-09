@@ -89,7 +89,9 @@ export default function ApartmentModal({ apartment, onClose }) {
 
   const normalizeImageUrl = (img) => {
     if (!img) return img;
-    return img.startsWith('/uploads/') ? `http://localhost:5000${img}` : img;
+    return img.startsWith('/uploads/')
+      ? `https://luxury-apartment.onrender.com${img}`
+      : img;
   };
 
   return (

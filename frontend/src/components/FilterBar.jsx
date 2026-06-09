@@ -25,9 +25,10 @@ export default function FilterBar({ filters, onChange, count }) {
   const [local, setLocal] = useState(filters)
 
   useEffect(() => {
-    axios.get('/api/apartments/meta/locations')
-      .then(r => setLocations(r.data.data || []))
-      .catch(() => {})
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/api/apartments/meta/locations`)
+      .then((r) => setLocations(r.data.data || []))
+      .catch(() => {});
   }, [])
 
   useEffect(() => { setLocal(filters) }, [filters])

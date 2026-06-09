@@ -168,12 +168,15 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const [aRes, pRes, sRes, iRes, adRes, locRes] = await Promise.all([
-        axios.get('/api/admin/apartments', authH),
-        axios.get('/api/admin/partners', authH),
-        axios.get('/api/admin/sales', authH),
-        axios.get('/api/admin/inquiries', authH),
-        axios.get('/api/admin/admins', authH),
-        axios.get('/api/apartments/meta/locations'),
+        axios.get(
+          `${import.meta.env.VITE_API_URL}/api/admin/apartments`,
+          authH
+        ),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/admin/partners`, authH),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/admin/sales`, authH),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/admin/inquiries`, authH),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/admin/admins`, authH),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/apartments/meta/locations`),
       ]);
       setApartments(aRes.data.data || []);
       setPartners(pRes.data.data || []);
@@ -225,7 +228,10 @@ export default function AdminDashboard() {
   const handleDeleteApt = async (id) => {
     if (!window.confirm('Delete this apartment listing?')) return;
     try {
-      await axios.delete(`/api/apartments/${id}`, authH);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/apartments/${id}`,
+        authH
+      );
       setApartments((prev) => prev.filter((a) => a.id !== id));
     } catch {
       alert('Delete failed.');
@@ -234,7 +240,11 @@ export default function AdminDashboard() {
 
   const handleToggleApt = async (id, field, current) => {
     try {
-      await axios.patch(`/api/apartments/${id}`, { [field]: !current }, authH);
+      await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/apartments/${id}`,
+        { [field]: !current },
+        authH
+      );
       setApartments((prev) =>
         prev.map((a) => (a.id === id ? { ...a, [field]: !current } : a))
       );
@@ -270,12 +280,16 @@ export default function AdminDashboard() {
         const formData = new FormData();
         formData.append('image', files[i]);
 
-        const res = await axios.post('/api/uploads', formData, {
-          headers: {
-            ...authH.headers,
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/uploads`,
+          formData,
+          {
+            headers: {
+              ...authH.headers,
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
 
         if (res.data.success && res.data.url) {
           setAptForm((prev) => ({
@@ -321,7 +335,11 @@ export default function AdminDashboard() {
         ...aptForm,
         images: Array.isArray(aptForm.images) ? aptForm.images : [],
       };
-      const res = await axios.post('/api/apartments', payload, authH);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/apartments`,
+        payload,
+        authH
+      );
       setAptSuccess(
         `Apartment "${aptForm.title}" posted successfully! (ID: ${res.data.id})`
       );
@@ -341,7 +359,11 @@ export default function AdminDashboard() {
   const handleInquiryUpdate = async (id, patch) => {
     setInquiryUpdatingId(id);
     try {
-      await axios.patch(`/api/admin/inquiries/${id}`, patch, authH);
+      await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/admin/inquiries/${id}`,
+        patch,
+        authH
+      );
       setInquiries((prev) =>
         prev.map((item) =>
           item.id === id
@@ -366,7 +388,10 @@ export default function AdminDashboard() {
   const handleDeleteSale = async (id) => {
     if (!window.confirm('Delete this record?')) return;
     try {
-      await axios.delete(`/api/admin/sales/${id}`, authH);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/admin/sales/${id}`,
+        authH
+      );
       setSales((prev) => prev.filter((s) => s.id !== id));
     } catch {
       alert('Delete failed.');
@@ -382,7 +407,11 @@ export default function AdminDashboard() {
     }
     setSaleLoading(true);
     try {
-      await axios.post('/api/admin/sales', newSale, authH);
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/admin/sales`,
+        newSale,
+        authH
+      );
       setShowAddSale(false);
       setNewSale(BLANK_SALE);
       fetchAll();

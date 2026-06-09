@@ -16,7 +16,10 @@ export default function AdminLogin() {
     setError('')
     setLoading(true)
     try {
-      const res = await axios.post('/api/admin/login', form)
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/admin/login`,
+        form
+      );
       localStorage.setItem('admin_token', res.data.token)
       localStorage.setItem('admin_info', JSON.stringify(res.data.admin))
       navigate('/admin/dashboard')

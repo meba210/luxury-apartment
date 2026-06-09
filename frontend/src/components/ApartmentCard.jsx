@@ -13,7 +13,7 @@ export default function ApartmentCard({ apartment, onClick }) {
     images[0] ||
     'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600';
   const img = imgSrc.startsWith('/uploads/')
-    ? `http://localhost:5000${imgSrc}`
+    ? `https://luxury-apartment.onrender.com${imgSrc}`
     : imgSrc;
 
   return (
