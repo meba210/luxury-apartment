@@ -18,7 +18,11 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000', 'https://luxury-apartment.onrender.com'],
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://luxury-apartment-two.vercel.app/admin/login',
+    ],
     credentials: true,
   })
 );
