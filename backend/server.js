@@ -21,7 +21,7 @@ app.use(
     origin: [
       'http://localhost:5173',
       'http://localhost:3000',
-      'https://luxury-apartment-two.vercel.app/admin/login',
+      'https://luxury-apartment-two.vercel.app',
     ],
     credentials: true,
   })

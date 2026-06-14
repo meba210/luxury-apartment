@@ -4,7 +4,7 @@ const corsOptions = {
   origin: [
     'http://localhost:5173',
     'http://localhost:3000',
-    'https://luxury-apartment-two.vercel.app/admin/login',
+    'https://luxury-apartment-two.vercel.app',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
