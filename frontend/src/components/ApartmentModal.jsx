@@ -260,14 +260,14 @@ export default function ApartmentModal({ apartment, onClose }) {
               >
                 <FaPhone /> Inquire Now
               </button>
-              <a
+              {/* <a
                 href={`https://wa.me/251911234567?text=I'm interested in ${encodeURIComponent(apartment.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="modal__cta-btn modal__cta-btn--whatsapp"
               >
                 <FaWhatsapp /> WhatsApp
-              </a>
+              </a> */}
             </div>
           </div>
         </div>

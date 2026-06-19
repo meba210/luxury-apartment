@@ -703,13 +703,37 @@ a.home__contact-detail-value:hover {
   .home__testimonials-grid {
     grid-template-columns: 1fr;
   }
+  .home__featured-header {
+    align-items: flex-start;
+  }
+  .home__partner {
+    padding: 56px 0;
+  }
+  .home__partner-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+  .home__partner-content {
+    min-width: 0;
+    width: 100%;
+  }
+  .home__partner-items {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .home__partner-item {
+    align-items: flex-start;
+  }
   .home__partner-badge {
     display: none;
   }
   .home__contact-form-wrap {
     padding: 20px;
   }
+  .home__rating-card {
+    padding: 18px;
+  }
   .home__stats-banner-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 }
