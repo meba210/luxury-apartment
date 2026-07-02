@@ -176,7 +176,9 @@ export default function AdminDashboard() {
         axios.get(`${import.meta.env.VITE_API_URL}/api/admin/sales`, authH),
         axios.get(`${import.meta.env.VITE_API_URL}/api/admin/inquiries`, authH),
         axios.get(`${import.meta.env.VITE_API_URL}/api/admin/admins`, authH),
-        axios.get(`${import.meta.env.VITE_API_URL}/api/apartments/meta/locations`),
+        axios.get(
+          `${import.meta.env.VITE_API_URL}/api/apartments/meta/locations`
+        ),
       ]);
       setApartments(aRes.data.data || []);
       setPartners(pRes.data.data || []);
@@ -202,7 +204,11 @@ export default function AdminDashboard() {
   const handlePartnerStatus = async (id, status) => {
     setActionLoading(id + status);
     try {
-      await axios.patch(`/api/admin/partners/${id}`, { status }, authH);
+      await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/admin/partners/${id}`,
+        { status },
+        authH
+      );
       setPartners((prev) =>
         prev.map((p) =>
           p.id === id
