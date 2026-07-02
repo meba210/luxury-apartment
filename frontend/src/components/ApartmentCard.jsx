@@ -1,5 +1,6 @@
 import { FaBed, FaBath, FaCar, FaMapMarkerAlt, FaEye } from 'react-icons/fa';
 import './ApartmentCard.css';
+import { normalizeImageUrl } from '../utils/normalizeImageUrl';
 
 function formatETB(n) {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1).replace(/\.0$/, '')}M`;
@@ -12,9 +13,7 @@ export default function ApartmentCard({ apartment, onClick }) {
   const imgSrc =
     images[0] ||
     'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600';
-  const img = imgSrc.startsWith('/uploads/')
-    ? `https://luxury-apartment.onrender.com${imgSrc}`
-    : imgSrc;
+  const img = normalizeImageUrl(imgSrc);
 
   return (
     <div

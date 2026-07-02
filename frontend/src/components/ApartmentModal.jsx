@@ -15,6 +15,7 @@ import {
   FaCheckCircle,
 } from 'react-icons/fa';
 import './ApartmentModal.css';
+import { normalizeImageUrl } from '../utils/normalizeImageUrl';
 
 function formatETB(n) {
   return new Intl.NumberFormat('en-ET').format(n);
@@ -85,13 +86,6 @@ export default function ApartmentModal({ apartment, onClose }) {
     navigate('/contact', {
       state: { apartmentTitle: apartment.title, apartmentId: apartment.id },
     });
-  };
-
-  const normalizeImageUrl = (img) => {
-    if (!img) return img;
-    return img.startsWith('/uploads/')
-      ? `https://luxury-apartment.onrender.com${img}`
-      : img;
   };
 
   return (

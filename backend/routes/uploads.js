@@ -79,9 +79,10 @@ router.post('/', requireAdmin, upload.single('image'), (req, res) => {
         .json({ success: false, message: 'No file uploaded' });
     }
 
-    // Return the file URL relative to the backend server
-    const origin = `${req.protocol}://${req.get('host')}`;
-    const fileUrl = `${origin}/uploads/${req.file.filename}`;
+    const baseUrl =
+      process.env.PUBLIC_URL || process.env.BACKEND_URL || process.env.APP_URL;
+    const origin = baseUrl || `${req.protocol}://${req.get('host')}`;
+    const fileUrl = `${origin.replace(/\/$/, '')}/uploads/${req.file.filename}`;
 
     res.json({
       success: true,

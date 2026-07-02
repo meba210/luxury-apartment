@@ -9,10 +9,8 @@ const values = [
 ]
 
 const team = [
-  { name: 'Abebe Girma', role: 'CEO & Founder', img: 'https://i.pravatar.cc/200?img=12' },
-  { name: 'Tigist Haile', role: 'Head of Sales', img: 'https://i.pravatar.cc/200?img=47' },
-  { name: 'Dawit Bekele', role: 'Investment Advisor', img: 'https://i.pravatar.cc/200?img=15' },
-  { name: 'Meron Tadesse', role: 'Property Manager', img: 'https://i.pravatar.cc/200?img=32' },
+  { name: 'Minilik Abera', role: 'CEO & Founder', img: 'https://i.pravatar.cc/200?img=12' },
+  
 ]
 
 export default function About() {
@@ -110,8 +108,8 @@ export default function About() {
       <section className="about-page__team section">
         <div className="container">
           <div className="section-header">
-            <span className="overline">The People Behind It</span>
-            <h2>MEET OUR TEAM</h2>
+            <span className="overline">The Person Behind It</span>
+            <h2>MEET OUR Founder</h2>
             <div className="gold-divider" />
           </div>
           <div className="about-page__team-grid">

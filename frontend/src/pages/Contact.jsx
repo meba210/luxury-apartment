@@ -13,9 +13,9 @@ const contactDetails = [
   {
     icon: <FaPhone />,
     title: 'Call Us',
-    lines: ['+251 935584767', '+251 9963320937'],
+    lines: ['+251 935584767', '+251 963320937'],
     href: 'tel:+251 935584767',
-    href: 'tel:+251 9963320937',
+    href: 'tel:+251 963320937',
   },
 
   {
