@@ -208,6 +208,10 @@
   border-radius: var(--radius-md);
   overflow: hidden;
   transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .about-page__team-card:hover {
@@ -218,7 +222,7 @@
 
 .about-page__team-img-wrap {
   position: relative;
-  height: 220px;
+  height: 300px;
   overflow: hidden;
 }
 

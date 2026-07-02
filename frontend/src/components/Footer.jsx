@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, FaMapMarkerAlt, FaGlobe } from 'react-icons/fa'
 import './Footer.css'
+import { FaTelegram } from 'react-icons/fa';
+import { FaTiktok } from 'react-icons/fa';
 
 export default function Footer() {
   return (
@@ -46,14 +48,26 @@ export default function Footer() {
                 people to premium properties and investment opportunities.
               </p>
               <div className="footer__socials">
-                <a href="#" aria-label="Facebook" className="footer__social">
-                  <FaFacebook />
+                <a
+                  href="https://t.me/@Minilik_abera"
+                  aria-label="Telegram"
+                  className="footer__social"
+                >
+                  <FaTelegram />
                 </a>
-                <a href="#" aria-label="Instagram" className="footer__social">
+                <a
+                  href="https://www.instagram.com/milevia_estates?igsh=b2x4cmFkZHQwemRj"
+                  aria-label="Instagram"
+                  className="footer__social"
+                >
                   <FaInstagram />
                 </a>
-                <a href="#" aria-label="LinkedIn" className="footer__social">
-                  <FaLinkedin />
+                <a
+                  href="https://www.tiktok.com/@milevia_estates?_r=1&_t=ZS-97fpZoyu2XE"
+                  aria-label="TikTok"
+                  className="footer__social"
+                >
+                  <FaTiktok />
                 </a>
               </div>
             </div>
@@ -109,10 +123,10 @@ export default function Footer() {
                   <FaEnvelope className="footer__contact-icon" />
                   <a href="mailto:minilikab4@gmail.com">minilikab4@gmail.com</a>
                 </li>
-                <li>
+                {/* <li>
                   <FaGlobe className="footer__contact-icon" />
                   <a href="#">www.milevia.com</a>
-                </li>
+                </li> */}
                 {/* <li>
                   <FaMapMarkerAlt className="footer__contact-icon" />
                   <span>Bole, Addis Ababa, Ethiopia</span>

@@ -1,68 +1,83 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import { FaSearch, FaBed, FaTag, FaMapMarkerAlt, FaTimes } from 'react-icons/fa'
-import './FilterBar.css'
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  FaSearch,
+  FaBed,
+  FaTag,
+  FaMapMarkerAlt,
+  FaTimes,
+} from 'react-icons/fa';
+import './FilterBar.css';
 
-// Only 2+ bedrooms — apartments only, for sale only
+// Only 2+ bedrooms — live properties for sale only
 const bedroomOptions = [
-  { value: '',  label: 'All Apartments' },
-  { value: '2', label: '2 Bedroom Apartment' },
-  { value: '3', label: '3 Bedroom Apartment' },
-  { value: '4', label: '4+ Bedroom Apartment' },
-]
+  { value: '', label: 'All Properties' },
+  { value: '2', label: '2 Bedroom Property' },
+  { value: '3', label: '3 Bedroom Property' },
+  { value: '4', label: '4+ Bedroom Property' },
+];
 
 const priceRanges = [
-  { label: 'All Prices',        min: null,     max: null     },
-  { label: 'Under 8M ETB',      min: null,     max: 8000000  },
-  { label: '8M – 12M ETB',      min: 8000000,  max: 12000000 },
-  { label: '12M – 18M ETB',     min: 12000000, max: 18000000 },
-  { label: '18M – 30M ETB',     min: 18000000, max: 30000000 },
-  { label: '30M+ ETB',          min: 30000000, max: null     },
-]
+  { label: 'All Prices', min: null, max: null },
+  { label: 'Under 8M ETB', min: null, max: 8000000 },
+  { label: '8M – 12M ETB', min: 8000000, max: 12000000 },
+  { label: '12M – 18M ETB', min: 12000000, max: 18000000 },
+  { label: '18M – 30M ETB', min: 18000000, max: 30000000 },
+  { label: '30M+ ETB', min: 30000000, max: null },
+];
 
 export default function FilterBar({ filters, onChange, count }) {
-  const [locations, setLocations] = useState([])
-  const [local, setLocal] = useState(filters)
+  const [locations, setLocations] = useState([]);
+  const [local, setLocal] = useState(filters);
 
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_API_URL}/api/apartments/meta/locations`)
       .then((r) => setLocations(r.data.data || []))
       .catch(() => {});
-  }, [])
+  }, []);
 
-  useEffect(() => { setLocal(filters) }, [filters])
+  useEffect(() => {
+    setLocal(filters);
+  }, [filters]);
 
-  const handleSearch = () => onChange(local)
+  const handleSearch = () => onChange(local);
 
   const handleClear = () => {
-    const cleared = { bedrooms: '', location_id: '', min_price: '', max_price: '' }
-    setLocal(cleared)
-    onChange(cleared)
-  }
+    const cleared = {
+      bedrooms: '',
+      location_id: '',
+      min_price: '',
+      max_price: '',
+    };
+    setLocal(cleared);
+    onChange(cleared);
+  };
 
-  const hasFilters = local.bedrooms || local.location_id || local.min_price || local.max_price
+  const hasFilters =
+    local.bedrooms || local.location_id || local.min_price || local.max_price;
 
-  const activePriceIdx = priceRanges.findIndex(r =>
-    (r.min ? String(r.min) : '') === local.min_price &&
-    (r.max ? String(r.max) : '') === local.max_price
-  )
+  const activePriceIdx = priceRanges.findIndex(
+    (r) =>
+      (r.min ? String(r.min) : '') === local.min_price &&
+      (r.max ? String(r.max) : '') === local.max_price
+  );
 
   const handlePriceRange = (range) => {
-    setLocal(prev => ({
+    setLocal((prev) => ({
       ...prev,
       min_price: range.min ? String(range.min) : '',
       max_price: range.max ? String(range.max) : '',
-    }))
-  }
+    }));
+  };
 
   return (
     <section className="filterbar">
       <div className="container">
         <div className="filterbar__header">
-          <h2 className="filterbar__title">FIND YOUR PERFECT APARTMENT</h2>
+          <h2 className="filterbar__title">FIND YOUR PERFECT PROPERTY</h2>
           <p className="filterbar__subtitle">
-            Premium 2, 3 &amp; 4+ bedroom apartments for sale across Addis Ababa
+            Premium 2, 3 &amp; 4+ bedroom residences for sale across Addis Ababa
           </p>
         </div>
 
@@ -203,7 +218,7 @@ export default function FilterBar({ filters, onChange, count }) {
           )}
           <button className="filterbar__search-btn" onClick={handleSearch}>
             <FaSearch />
-            SEARCH APARTMENTS
+            SEARCH PROPERTIES
             {count !== undefined && (
               <span className="filterbar__count">({count} found)</span>
             )}

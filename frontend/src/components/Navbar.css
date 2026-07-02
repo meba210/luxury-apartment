@@ -21,10 +21,11 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 72px;
+  min-height: 72px;
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 16px 24px;
+  flex-wrap: wrap;
 }
 
 /* Logo */
@@ -126,8 +127,8 @@
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: rgba(201,168,76,0.1);
-  border: 1px solid rgba(201,168,76,0.3);
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px solid rgba(201, 168, 76, 0.3);
   border-radius: var(--radius-sm);
   color: var(--gold);
   font-size: 0.75rem;
@@ -140,7 +141,7 @@
 }
 
 .navbar__partner-link:hover {
-  background: rgba(201,168,76,0.2);
+  background: rgba(201, 168, 76, 0.2);
   border-color: var(--gold);
   transform: translateY(-1px);
 }
@@ -154,7 +155,7 @@
   background: rgba(37, 211, 102, 0.12);
   border: 1px solid rgba(37, 211, 102, 0.4);
   border-radius: var(--radius-sm);
-  color: #25D366;
+  color: #25d366;
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -166,7 +167,7 @@
 
 .navbar__whatsapp:hover {
   background: rgba(37, 211, 102, 0.22);
-  border-color: #25D366;
+  border-color: #25d366;
   transform: translateY(-1px);
 }
 
@@ -240,20 +241,57 @@
 }
 
 @media (max-width: 1024px) {
-  .navbar__links { gap: 0; }
-  .navbar__link { padding: 8px 10px; font-size: 0.75rem; }
+  .navbar__links {
+    gap: 0;
+  }
+  .navbar__link {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
 }
 
 @media (max-width: 900px) {
   .navbar__links,
-  .navbar__whatsapp { display: none; }
-  .navbar__hamburger { display: flex; }
-  .navbar__mobile { display: block; }
-  .navbar__inner { gap: 16px; }
+  .navbar__whatsapp,
+  .navbar__partner-link {
+    display: none;
+  }
+  .navbar__hamburger {
+    display: flex;
+  }
+  .navbar__mobile {
+    display: block;
+  }
+  .navbar__inner {
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .navbar__logo-text {
+    max-width: 220px;
+  }
 }
 
 @media (max-width: 480px) {
-  .navbar__logo-main { font-size: 0.85rem; }
-  .navbar__logo-sub { font-size: 0.55rem; }
-  .navbar__logo-tagline { display: none; }
+  .navbar__inner {
+    padding: 10px 14px;
+  }
+  .navbar__logo {
+    max-width: calc(100% - 52px);
+  }
+  .navbar__logo-main {
+    font-size: 0.8rem;
+  }
+  .navbar__logo-sub {
+    font-size: 0.52rem;
+  }
+  .navbar__logo-tagline {
+    display: none;
+  }
+  .navbar__logo-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .navbar__hamburger {
+    padding: 7px;
+  }
 }

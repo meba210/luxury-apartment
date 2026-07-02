@@ -19,9 +19,16 @@ router.get('/meta/locations', async (req, res) => {
 // Get all apartments with optional filters
 router.get('/', async (req, res) => {
   try {
-    const { bedrooms, location_id, min_price, max_price, featured } = req.query;
+    const {
+      bedrooms,
+      location_id,
+      min_price,
+      max_price,
+      featured,
+      property_type,
+    } = req.query;
 
-    // Always enforce: only apartments with 2+ bedrooms, available for sale
+    // Show all live properties with 2+ bedrooms, including apartments, duplexes and penthouses.
     let query = `
       SELECT a.*, l.name as location_name, l.description as location_description
       FROM apartments a
@@ -31,6 +38,10 @@ router.get('/', async (req, res) => {
     `;
     const params = [];
 
+    if (property_type) {
+      query += ' AND a.property_type = ?';
+      params.push(property_type);
+    }
     if (bedrooms) {
       query += ' AND a.bedrooms = ?';
       params.push(parseInt(bedrooms));
@@ -119,6 +130,7 @@ router.post('/', requireAdmin, async (req, res) => {
       size_sqm,
       price_etb,
       price_usd,
+      property_type,
       location_id,
       floor,
       total_floors,
@@ -129,21 +141,25 @@ router.post('/', requireAdmin, async (req, res) => {
     } = req.body;
 
     if (!title || !bedrooms || !bathrooms || !price_etb) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: 'Title, bedrooms, bathrooms and price are required.',
-        });
+      return res.status(400).json({
+        success: false,
+        message: 'Title, bedrooms, bathrooms and price are required.',
+      });
     }
     if (parseInt(bedrooms) < 2) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: 'Only apartments with 2 or more bedrooms are allowed.',
-        });
+      return res.status(400).json({
+        success: false,
+        message: 'Only properties with 2 or more bedrooms are allowed.',
+      });
     }
+
+    const normalizedPropertyType = [
+      'Apartment',
+      'Duplex',
+      'Penthouse',
+    ].includes(property_type)
+      ? property_type
+      : 'Apartment';
 
     const amenitiesJson = Array.isArray(amenities)
       ? JSON.stringify(amenities)
@@ -155,8 +171,8 @@ router.post('/', requireAdmin, async (req, res) => {
     const [result] = await pool.execute(
       `INSERT INTO apartments
         (title, description, bedrooms, bathrooms, size_sqm, price_etb, price_usd,
-         location_id, floor, total_floors, amenities, images, is_featured, is_available)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         property_type, location_id, floor, total_floors, amenities, images, is_featured, is_available)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         description || null,
@@ -165,6 +181,7 @@ router.post('/', requireAdmin, async (req, res) => {
         size_sqm ? parseFloat(size_sqm) : null,
         parseFloat(price_etb),
         price_usd ? parseFloat(price_usd) : null,
+        normalizedPropertyType,
         location_id ? parseInt(location_id) : null,
         floor ? parseInt(floor) : null,
         total_floors ? parseInt(total_floors) : null,
@@ -175,13 +192,11 @@ router.post('/', requireAdmin, async (req, res) => {
       ]
     );
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: 'Apartment posted successfully.',
-        id: result.insertId,
-      });
+    res.status(201).json({
+      success: true,
+      message: 'Property posted successfully.',
+      id: result.insertId,
+    });
   } catch (error) {
     console.error('Error posting apartment:', error);
     res

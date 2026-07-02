@@ -78,6 +78,13 @@ async function initializeDatabase() {
         `✅ Locations table ready (${locations[0].count} locations found)`
       );
     }
+
+    await pool.execute(
+      "ALTER TABLE apartments ADD COLUMN IF NOT EXISTS property_type VARCHAR(50) NOT NULL DEFAULT 'Apartment'"
+    );
+    await pool.execute(
+      "UPDATE apartments SET property_type = CASE WHEN LOWER(title) LIKE '%penthouse%' THEN 'Penthouse' WHEN LOWER(title) LIKE '%duplex%' THEN 'Duplex' ELSE 'Apartment' END WHERE property_type IS NULL OR property_type = ''"
+    );
   } catch (err) {
     console.error('❌ Database initialization error:', err.message);
     // Don't crash the server, just log the error

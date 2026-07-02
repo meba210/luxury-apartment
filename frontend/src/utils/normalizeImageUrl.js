@@ -1,19 +1,36 @@
 export function normalizeImageUrl(img, baseUrl = import.meta.env.VITE_API_URL) {
   if (!img) return img;
 
-  if (/^https?:\/\//i.test(img)) {
-    return img;
-  }
+  const value = String(img).trim();
+  if (!value) return value;
 
-  if (img.startsWith('/uploads/')) {
-    if (!baseUrl) return img;
-
+  if (/^https?:\/\//i.test(value)) {
     try {
-      return new URL(img, baseUrl).toString();
+      const parsed = new URL(value);
+      if (parsed.pathname.startsWith('/uploads/')) {
+        const apiBase =
+          baseUrl ||
+          (typeof window !== 'undefined' ? window.location.origin : '');
+        if (apiBase) {
+          return new URL(parsed.pathname + parsed.search, apiBase).toString();
+        }
+      }
+      return value;
     } catch {
-      return img;
+      return value;
     }
   }
 
-  return img;
+  if (value.startsWith('/uploads/') || value.startsWith('uploads/')) {
+    const normalizedPath = value.startsWith('/') ? value : `/${value}`;
+    if (!baseUrl) return normalizedPath;
+
+    try {
+      return new URL(normalizedPath, baseUrl).toString();
+    } catch {
+      return normalizedPath;
+    }
+  }
+
+  return value;
 }

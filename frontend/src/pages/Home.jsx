@@ -36,27 +36,7 @@ const testimonials = [
     stars: 5,
     text: 'MILEVIA Estates helped me find the perfect investment property. Their team is professional, trustworthy, and always available.',
   },
-  {
-    name: 'Lidya M.',
-    role: 'Home Owner',
-    avatar: 'https://i.pravatar.cc/60?img=47',
-    stars: 5,
-    text: 'The best real estate company in Addis Ababa. They guided me through the whole process smoothly. I found my dream home!',
-  },
-  {
-    name: 'Samuel A.',
-    role: 'Property Seller',
-    avatar: 'https://i.pravatar.cc/60?img=33',
-    stars: 5,
-    text: 'I successfully sold my property at the best price with their great marketing and network. Highly recommended!',
-  },
-  {
-    name: 'Hana G.',
-    role: 'Expat Resident',
-    avatar: 'https://i.pravatar.cc/60?img=25',
-    stars: 5,
-    text: 'As an expat, finding a luxury apartment in Addis was daunting. MILEVIA Estates made it seamless and stress-free.',
-  },
+ 
 ];
 
 const whyUs = [

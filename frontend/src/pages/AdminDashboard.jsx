@@ -87,6 +87,7 @@ function SortIcon({ col, sortCol, sortDir }) {
 const BLANK_APT = {
   title: '',
   description: '',
+  property_type: 'Apartment',
   bedrooms: '2',
   bathrooms: '2',
   size_sqm: '',
@@ -347,7 +348,7 @@ export default function AdminDashboard() {
         authH
       );
       setAptSuccess(
-        `Apartment "${aptForm.title}" posted successfully! (ID: ${res.data.id})`
+        `Property "${aptForm.title}" posted successfully! (ID: ${res.data.id})`
       );
       setAptForm(BLANK_APT);
       setAptImgInput('');
@@ -857,7 +858,7 @@ export default function AdminDashboard() {
           <div className="dashboard__table-card">
             <div className="dashboard__toolbar">
               <h3 className="dashboard__table-title">
-                <FaPlus /> Post New Apartment Listing
+                <FaPlus /> Post New Property Listing
               </h3>
               <p
                 style={{
@@ -866,7 +867,7 @@ export default function AdminDashboard() {
                   marginLeft: '8px',
                 }}
               >
-                Only 2+ bedroom apartments for sale are allowed.
+                Only 2+ bedroom properties for sale are allowed.
               </p>
             </div>
 
@@ -916,6 +917,23 @@ export default function AdminDashboard() {
                             {l.name}
                           </option>
                         ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Property Type *</label>
+                      <select
+                        className="form-select"
+                        value={aptForm.property_type}
+                        onChange={(e) =>
+                          setAptForm((p) => ({
+                            ...p,
+                            property_type: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="Apartment">Apartment</option>
+                        <option value="Duplex">Duplex</option>
+                        <option value="Penthouse">Penthouse</option>
                       </select>
                     </div>
                     <div className="form-group">

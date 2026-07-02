@@ -81,7 +81,9 @@ router.post('/', requireAdmin, upload.single('image'), (req, res) => {
 
     const baseUrl =
       process.env.PUBLIC_URL || process.env.BACKEND_URL || process.env.APP_URL;
-    const origin = baseUrl || `${req.protocol}://${req.get('host')}`;
+    const forwardedProto = req.get('x-forwarded-proto') || req.protocol;
+    const forwardedHost = req.get('x-forwarded-host') || req.get('host');
+    const origin = baseUrl || `${forwardedProto}://${forwardedHost}`;
     const fileUrl = `${origin.replace(/\/$/, '')}/uploads/${req.file.filename}`;
 
     res.json({

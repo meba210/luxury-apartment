@@ -3,9 +3,9 @@ import { FaArrowRight, FaBuilding, FaChartLine, FaUsers, FaHandshake } from 'rea
 import './Hero.css'
 
 const stats = [
-  { icon: <FaBuilding />, value: '150+', label: 'Properties Available' },
+  { icon: <FaBuilding />, value: '40+', label: 'Properties Available' },
   { icon: <FaChartLine />, value: '50+', label: 'Investment Opportunities' },
-  { icon: <FaUsers />, value: '100+', label: 'Happy Clients' },
+  { icon: <FaUsers />, value: '30+', label: 'Happy Clients' },
   { icon: <FaHandshake />, value: '25+', label: 'Partner Agents' },
 ]
 
@@ -63,7 +63,7 @@ export default function Hero() {
             </div>
             <div className="hero__trust-item">
               <span className="hero__trust-dot" />
-              Trusted Since 2014
+              Trusted Since 2024
             </div>
             <div className="hero__trust-item">
               <span className="hero__trust-dot" />
