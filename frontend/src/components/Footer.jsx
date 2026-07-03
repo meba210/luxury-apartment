@@ -49,7 +49,7 @@ export default function Footer() {
               </p>
               <div className="footer__socials">
                 <a
-                  href="https://t.me/@Minilik_abera"
+                  href="https://t.me/mileviaestates"
                   aria-label="Telegram"
                   className="footer__social"
                 >
@@ -96,14 +96,14 @@ export default function Footer() {
               <h4 className="footer__col-title">Property Types</h4>
               <ul className="footer__links">
                 <li>
-                  <Link to="/apartments">Apartments</Link>
+                  <Link to="/apartments?property_type=Apartment">Apartments</Link>
                 </li>
 
                 <li>
-                  <Link to="/Penthouses">Penthouses</Link>
+                  <Link to="/apartments?property_type=Penthouse">Penthouses</Link>
                 </li>
                 <li>
-                  <Link to="/Duplexes">Duplexes</Link>
+                  <Link to="/apartments?property_type=Duplex">Duplexes</Link>
                 </li>
               </ul>
             </div>
@@ -116,7 +116,7 @@ export default function Footer() {
                   <FaPhone className="footer__contact-icon" />
                   <div>
                     <a href="tel:+251935584767">+251 935584767</a>
-                    <a href="tel:+2519963320937">+251 9963320937</a>
+                    <a href="tel:+2519963320937">+251 963320937</a>
                   </div>
                 </li>
                 <li>

@@ -20,7 +20,9 @@ export default function Apartments() {
 
   const [filters, setFilters] = useState({
     bedrooms: searchParams.get('bedrooms') || '',
+    property_type: searchParams.get('property_type') || '',
     location_id: searchParams.get('location_id') || '',
+    location_name: searchParams.get('location_name') || '',
     min_price: searchParams.get('min_price') || '',
     max_price: searchParams.get('max_price') || '',
   });
@@ -31,7 +33,9 @@ export default function Apartments() {
     try {
       const params = new URLSearchParams();
       if (f.bedrooms) params.set('bedrooms', f.bedrooms);
-      if (f.location_id) params.set('location_id', f.location_id);
+      if (f.property_type) params.set('property_type', f.property_type);
+      if (f.location_name) params.set('location_name', f.location_name);
+      else if (f.location_id) params.set('location_id', f.location_id);
       if (f.min_price) params.set('min_price', f.min_price);
       if (f.max_price) params.set('max_price', f.max_price);
       const res = await axios.get(
@@ -127,7 +131,9 @@ export default function Apartments() {
                 onClick={() =>
                   handleFilterChange({
                     bedrooms: '',
+                    property_type: '',
                     location_id: '',
+                    location_name: '',
                     min_price: '',
                     max_price: '',
                   })

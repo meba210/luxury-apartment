@@ -1298,9 +1298,19 @@ export default function AdminDashboard() {
                     <th className="tbl-th">NAME</th>
                     <th className="tbl-th">EMAIL</th>
                     <th className="tbl-th">PHONE</th>
+                    <th className="tbl-th">Additional Phone</th>
+                    <th className="tbl-th">Telegram Username</th>
+                    <th className="tbl-th">Address</th>
+                    <th className="tbl-th">ID Number</th>
+                    <th className="tbl-th">Date of Birth</th>
+                    <th className="tbl-th">Education Level</th>
+                    <th className="tbl-th">Institution</th>
+                    <th className="tbl-th">Field of Study</th>
                     <th className="tbl-th">COMPANY</th>
                     <th className="tbl-th">EXPERIENCE</th>
                     <th className="tbl-th">MESSAGE</th>
+                    <th className="tbl-th">Passion</th>
+                    <th className="tbl-th">About The Partner</th>
                     <th className="tbl-th">APPLIED</th>
                     <th className="tbl-th">STATUS</th>
                     <th className="tbl-th">ACTIONS</th>
@@ -1331,6 +1341,18 @@ export default function AdminDashboard() {
                           <td className="tbl-td tbl-td--bold">{p.full_name}</td>
                           <td className="tbl-td">{p.email}</td>
                           <td className="tbl-td">{p.phone}</td>
+                          <td className="tbl-td">
+                            {p.additional_phone || '—'}
+                          </td>
+                          <td className="tbl-td">
+                            {p.telegram_username || '—'}
+                          </td>
+                          <td className="tbl-td">{p.address || '—'}</td>
+                          <td className="tbl-td">{p.id_number || '—'}</td>
+                          <td className="tbl-td">{p.dob || '—'}</td>
+                          <td className="tbl-td">{p.education_level || '—'}</td>
+                          <td className="tbl-td">{p.institution || '—'}</td>
+                          <td className="tbl-td">{p.field_of_study || '—'}</td>
                           <td className="tbl-td">{p.company || '—'}</td>
                           <td className="tbl-td">{p.experience || '—'}</td>
                           <td className="tbl-td">
@@ -1350,6 +1372,8 @@ export default function AdminDashboard() {
                               <span className="tbl-td--muted">—</span>
                             )}
                           </td>
+                          <td className="tbl-td">{p.passion || '—'}</td>
+                          <td className="tbl-td">{p.about || '—'}</td>
                           <td className="tbl-td">
                             {new Date(p.created_at).toLocaleDateString()}
                           </td>
@@ -1781,12 +1805,52 @@ export default function AdminDashboard() {
                   <strong>{selectedPartner.phone}</strong>
                 </div>
                 <div className="dash-modal__row">
+                  <span>Additional Phone</span>
+                  <strong>{selectedPartner.additional_phone}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>Telegram Username</span>
+                  <strong>{selectedPartner.telegram_username}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>Address</span>
+                  <strong>{selectedPartner.address}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>ID Number</span>
+                  <strong>{selectedPartner.id_number}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>Date of Birth</span>
+                  <strong>{selectedPartner.dob}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>Education Level</span>
+                  <strong>{selectedPartner.education_level}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>Institution</span>
+                  <strong>{selectedPartner.institution}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>Field of Study</span>
+                  <strong>{selectedPartner.field_of_study}</strong>
+                </div>
+                <div className="dash-modal__row">
                   <span>Company</span>
                   <strong>{selectedPartner.company || '—'}</strong>
                 </div>
                 <div className="dash-modal__row">
                   <span>Experience</span>
                   <strong>{selectedPartner.experience || '—'}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>Passion</span>
+                  <strong>{selectedPartner.passion || '—'}</strong>
+                </div>
+                <div className="dash-modal__row">
+                  <span>About The Partner</span>
+                  <strong>{selectedPartner.about || '—'}</strong>
                 </div>
                 <div className="dash-modal__row">
                   <span>Applied</span>
