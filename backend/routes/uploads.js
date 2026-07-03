@@ -67,11 +67,19 @@ router.post('/', requireAdmin, upload.single('image'), async (req, res) => {
       });
     }
 
+    const imageUrl = req.file.secure_url || req.file.path || req.file.url;
+    if (!imageUrl) {
+      return res.status(500).json({
+        success: false,
+        message: 'Cloudinary upload did not return a usable URL',
+      });
+    }
+
     res.json({
       success: true,
       message: 'Image uploaded successfully',
-      url: req.file.path,
-      public_id: req.file.filename,
+      url: imageUrl,
+      public_id: req.file.public_id || req.file.filename,
     });
   } catch (err) {
     console.error(err);

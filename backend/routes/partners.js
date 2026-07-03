@@ -6,6 +6,45 @@ const pool = require('../config/db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'milevia_secret_2024';
 
+async function hasColumn(tableName, columnName) {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
+      [tableName, columnName]
+    );
+    return rows.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+async function ensurePartnerColumns() {
+  const columns = [
+    { name: 'additional_phone', type: 'VARCHAR(50)' },
+    { name: 'telegram_username', type: 'VARCHAR(100)' },
+    { name: 'address', type: 'VARCHAR(255)' },
+    { name: 'id_number', type: 'VARCHAR(100)' },
+    { name: 'dob', type: 'DATE' },
+    { name: 'education_level', type: 'VARCHAR(100)' },
+    { name: 'institution', type: 'VARCHAR(200)' },
+    { name: 'field_of_study', type: 'VARCHAR(200)' },
+    { name: 'position', type: 'VARCHAR(200)' },
+    { name: 'real_estate_experience', type: 'TEXT' },
+    { name: 'passion', type: 'TEXT' },
+    { name: 'reason_for_joining', type: 'TEXT' },
+    { name: 'about', type: 'TEXT' },
+  ];
+
+  for (const col of columns) {
+    const exists = await hasColumn('partners', col.name);
+    if (!exists) {
+      await pool.execute(
+        `ALTER TABLE partners ADD COLUMN ${col.name} ${col.type}`
+      );
+    }
+  }
+}
+
 // ── Middleware: verify partner JWT ────────────────────────────
 function requirePartner(req, res, next) {
   const auth = req.headers.authorization;
@@ -15,55 +54,123 @@ function requirePartner(req, res, next) {
   try {
     const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
     if (decoded.role !== 'partner') {
-      return res.status(403).json({ success: false, message: 'Partner access required' });
+      return res
+        .status(403)
+        .json({ success: false, message: 'Partner access required' });
     }
     req.partner = decoded;
     next();
   } catch {
-    return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    return res
+      .status(401)
+      .json({ success: false, message: 'Invalid or expired token' });
   }
 }
 
 // ── POST /api/partners/register ───────────────────────────────
 router.post('/register', async (req, res) => {
   try {
-    const { full_name, email, phone, company, experience, message, password } = req.body;
+    const {
+      full_name,
+      email,
+      phone,
+      additional_phone,
+      telegram_username,
+      address,
+      id_number,
+      dob,
+      education_level,
+      institution,
+      field_of_study,
+      company,
+      position,
+      experience,
+      real_estate_experience,
+      passion,
+      reason_for_joining,
+      about,
+      message,
+      password,
+    } = req.body;
 
     if (!full_name || !email || !phone || !password) {
-      return res.status(400).json({ success: false, message: 'Name, email, phone and password are required.' });
+      return res.status(400).json({
+        success: false,
+        message: 'Name, email, phone and password are required.',
+      });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ success: false, message: 'Invalid email address.' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid email address.' });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' });
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters.',
+      });
     }
 
     // Check duplicate email
-    const [existing] = await pool.execute('SELECT id FROM partners WHERE email = ?', [email]);
+    const [existing] = await pool.execute(
+      'SELECT id FROM partners WHERE email = ?',
+      [email]
+    );
     if (existing.length > 0) {
-      return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
+      return res.status(409).json({
+        success: false,
+        message: 'An account with this email already exists.',
+      });
     }
+
+    await ensurePartnerColumns();
 
     const hash = await bcrypt.hash(password, 10);
 
     const [result] = await pool.execute(
-      `INSERT INTO partners (full_name, email, phone, company, experience, message, password_hash)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [full_name, email, phone, company || null, experience || null, message || null, hash]
+      `INSERT INTO partners (
+         full_name, email, phone, additional_phone, telegram_username, address, id_number,
+         dob, education_level, institution, field_of_study, company, position,
+         experience, real_estate_experience, passion, reason_for_joining, about, message, password_hash
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        full_name,
+        email,
+        phone,
+        additional_phone || null,
+        telegram_username || null,
+        address || null,
+        id_number || null,
+        dob || null,
+        education_level || null,
+        institution || null,
+        field_of_study || null,
+        company || null,
+        position || null,
+        experience || null,
+        real_estate_experience || null,
+        passion || null,
+        reason_for_joining || null,
+        about || null,
+        message || reason_for_joining || null,
+        hash,
+      ]
     );
 
     res.status(201).json({
       success: true,
-      message: 'Registration submitted! Your application is under review. We will notify you by email once approved.',
-      id: result.insertId
+      message:
+        'Registration submitted! Your application is under review. We will notify you by email once approved.',
+      id: result.insertId,
     });
   } catch (err) {
     console.error('Partner register error:', err);
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: 'Server error', error: err.message });
   }
 });
 
@@ -72,29 +179,51 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email and password are required.' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'Email and password are required.' });
     }
 
-    const [rows] = await pool.execute('SELECT * FROM partners WHERE email = ?', [email]);
+    const [rows] = await pool.execute(
+      'SELECT * FROM partners WHERE email = ?',
+      [email]
+    );
     if (rows.length === 0) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+      return res
+        .status(401)
+        .json({ success: false, message: 'Invalid email or password.' });
     }
 
     const partner = rows[0];
     const match = await bcrypt.compare(password, partner.password_hash);
     if (!match) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
+      return res
+        .status(401)
+        .json({ success: false, message: 'Invalid email or password.' });
     }
 
     if (partner.status === 'pending') {
-      return res.status(403).json({ success: false, message: 'Your application is still under review. Please wait for admin approval.' });
+      return res.status(403).json({
+        success: false,
+        message:
+          'Your application is still under review. Please wait for admin approval.',
+      });
     }
     if (partner.status === 'rejected') {
-      return res.status(403).json({ success: false, message: 'Your application was not approved. Please contact us for more information.' });
+      return res.status(403).json({
+        success: false,
+        message:
+          'Your application was not approved. Please contact us for more information.',
+      });
     }
 
     const token = jwt.sign(
-      { id: partner.id, email: partner.email, name: partner.full_name, role: 'partner' },
+      {
+        id: partner.id,
+        email: partner.email,
+        name: partner.full_name,
+        role: 'partner',
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -109,21 +238,35 @@ router.post('/login', async (req, res) => {
         phone: partner.phone,
         company: partner.company,
         status: partner.status,
-        approved_at: partner.approved_at
-      }
+        approved_at: partner.approved_at,
+      },
     });
   } catch (err) {
     console.error('Partner login error:', err);
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: 'Server error', error: err.message });
   }
 });
 
 // ── GET /api/partners/sales  (approved partners only) ─────────
 router.get('/sales', requirePartner, async (req, res) => {
   try {
-    const { search, status, type, sort = 'created_at', order = 'desc' } = req.query;
+    const {
+      search,
+      status,
+      type,
+      sort = 'created_at',
+      order = 'desc',
+    } = req.query;
 
-    const allowed = ['created_at', 'price_etb', 'area_sqm', 'per_sqm_birr', 'place'];
+    const allowed = [
+      'created_at',
+      'price_etb',
+      'area_sqm',
+      'per_sqm_birr',
+      'place',
+    ];
     const sortCol = allowed.includes(sort) ? sort : 'created_at';
     const sortDir = order === 'asc' ? 'ASC' : 'DESC';
 
@@ -149,7 +292,9 @@ router.get('/sales', requirePartner, async (req, res) => {
     res.json({ success: true, data: rows, count: rows.length });
   } catch (err) {
     console.error('Sales fetch error:', err);
-    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: 'Server error', error: err.message });
   }
 });
 
@@ -160,7 +305,10 @@ router.get('/me', requirePartner, async (req, res) => {
       'SELECT id, full_name, email, phone, company, experience, status, approved_at, created_at FROM partners WHERE id = ?',
       [req.partner.id]
     );
-    if (rows.length === 0) return res.status(404).json({ success: false, message: 'Partner not found' });
+    if (rows.length === 0)
+      return res
+        .status(404)
+        .json({ success: false, message: 'Partner not found' });
     res.json({ success: true, data: rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error' });

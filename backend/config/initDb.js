@@ -1,5 +1,17 @@
 const pool = require('./db');
 
+async function hasColumn(tableName, columnName) {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
+      [tableName, columnName]
+    );
+    return rows.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Initialize database with required tables and data
  * Runs on server startup to ensure locations exist
@@ -79,12 +91,41 @@ async function initializeDatabase() {
       );
     }
 
-    await pool.execute(
-      "ALTER TABLE apartments ADD COLUMN IF NOT EXISTS property_type VARCHAR(50) NOT NULL DEFAULT 'Apartment'"
-    );
+    const hasPropertyType = await hasColumn('apartments', 'property_type');
+    if (!hasPropertyType) {
+      await pool.execute(
+        "ALTER TABLE apartments ADD COLUMN property_type VARCHAR(50) NOT NULL DEFAULT 'Apartment'"
+      );
+    }
+
     await pool.execute(
       "UPDATE apartments SET property_type = CASE WHEN LOWER(title) LIKE '%penthouse%' THEN 'Penthouse' WHEN LOWER(title) LIKE '%duplex%' THEN 'Duplex' ELSE 'Apartment' END WHERE property_type IS NULL OR property_type = ''"
     );
+
+    const partnerColumns = [
+      { name: 'additional_phone', type: 'VARCHAR(50)' },
+      { name: 'telegram_username', type: 'VARCHAR(100)' },
+      { name: 'address', type: 'VARCHAR(255)' },
+      { name: 'id_number', type: 'VARCHAR(100)' },
+      { name: 'dob', type: 'DATE' },
+      { name: 'education_level', type: 'VARCHAR(100)' },
+      { name: 'institution', type: 'VARCHAR(200)' },
+      { name: 'field_of_study', type: 'VARCHAR(200)' },
+      { name: 'position', type: 'VARCHAR(200)' },
+      { name: 'real_estate_experience', type: 'TEXT' },
+      { name: 'passion', type: 'TEXT' },
+      { name: 'reason_for_joining', type: 'TEXT' },
+      { name: 'about', type: 'TEXT' },
+    ];
+
+    for (const col of partnerColumns) {
+      const exists = await hasColumn('partners', col.name);
+      if (!exists) {
+        await pool.execute(
+          `ALTER TABLE partners ADD COLUMN ${col.name} ${col.type}`
+        );
+      }
+    }
   } catch (err) {
     console.error('❌ Database initialization error:', err.message);
     // Don't crash the server, just log the error

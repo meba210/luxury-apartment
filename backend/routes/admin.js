@@ -120,7 +120,7 @@ router.get('/partners', requireAdmin, async (req, res) => {
   try {
     const { status } = req.query;
     let query =
-      'SELECT id, full_name, email, phone, company, experience, message, status, approved_at, created_at FROM partners';
+      'SELECT *FROM partners';
     const params = [];
     if (status) {
       query += ' WHERE status = ?';
