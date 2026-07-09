@@ -279,9 +279,9 @@ export default function FilterBar({ filters, onChange, count }) {
           <button className="filterbar__search-btn" onClick={handleSearch}>
             <FaSearch />
             SEARCH PROPERTIES
-            {count !== undefined && (
+            {/* {count !== undefined && (
               <span className="filterbar__count">({count})</span>
-            )}
+            )} */}
           </button>
         </div>
       </div>

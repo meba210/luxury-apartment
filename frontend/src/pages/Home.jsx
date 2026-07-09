@@ -44,17 +44,17 @@ const whyUs = [
   {
     icon: <FaAward />,
     title: 'Premium Quality',
-    desc: 'Every property meets our rigorous standards for luxury finishes, modern amenities, and exceptional craftsmanship.',
+    desc: 'Every property is carefully selected to meet the highest standards of quality, comfort, and lasting value.',
   },
   {
     icon: <FaMapMarkerAlt />,
     title: 'Prime Locations',
-    desc: "Strategically located in Addis Ababa's most sought-after neighborhoods — Bole, Kazanchis, Sarbet and more.",
+    desc: 'All of our listings are located in prime locations, offering exceptional convenience, accessibility, and long-term investment value.',
   },
   {
     icon: <FaShieldAlt />,
     title: '24/7 Security',
-    desc: 'Round-the-clock security, CCTV surveillance, and professional concierge services for your peace of mind.',
+    desc: 'Enjoy complete peace of mind with professionally managed, around-the-clock security in every featured property. Your safety and comfort come first.',
   },
   {
     icon: <FaUsers />,
@@ -218,8 +218,9 @@ export default function Home() {
             <h2>THE MILEVIA DIFFERENCE</h2>
             <div className="gold-divider" />
             <p>
-              We combine deep local knowledge with world-class service to
-              deliver an unmatched real estate experience.
+              We don't measure success by the number of properties we sell, we
+              measure it by the trust we build, the value we deliver, and the
+              lasting relationships we create.
             </p>
           </div>
           <div className="home__why-grid">
@@ -258,14 +259,14 @@ export default function Home() {
                   <FaCheckCircle className="home__partner-check" />
                   <div>
                     <strong>Bring a Property</strong>
-                    <span>→ Earn Seller Commission</span>
+                    <span>→ Earn up to 75% of seller commission</span>
                   </div>
                 </div>
                 <div className="home__partner-item">
                   <FaCheckCircle className="home__partner-check" />
                   <div>
                     <strong>Bring a Buyer</strong>
-                    <span>→ Earn up to 75% Buyer Commission</span>
+                    <span>→ Earn up to 75% of buyer commission</span>
                   </div>
                 </div>
               </div>

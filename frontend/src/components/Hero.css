@@ -3,10 +3,11 @@
 ═══════════════════════════════════════════════ */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height:750px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+ overflow: visible;
+ width: 100%;
 }
 
 /* ── Background ── */
@@ -14,6 +15,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+   width: 100%;
 }
 
 .hero__bg-img {
@@ -32,6 +34,7 @@
 }
 
 .hero__overlay {
+   width: 100%;
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -43,6 +46,7 @@
 }
 
 .hero__overlay-warm {
+   width: 100%;
   position: absolute;
   inset: 0;
   background: radial-gradient(
@@ -73,13 +77,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 40px;
-  padding-top: 120px;
-  padding-bottom: 56px;
+  gap: 150px;
+   padding-top:120px;
+    padding-bottom:80px;
+     width: 100%;
 }
 
 .hero__text {
-  max-width: 600px;
+  max-width:100%;
   flex-shrink: 0;
 }
 
@@ -195,8 +200,9 @@
 
 /* ── Floating property card ── */
 .hero__card {
+  height: 400px;
   flex-shrink: 0;
-  width: 290px;
+  width: 400px;
   background: rgba(12, 9, 3, 0.88);
   border: 1px solid rgba(201, 168, 76, 0.38);
   border-radius: var(--radius-lg);
@@ -208,6 +214,7 @@
     0 0 0 1px rgba(201, 168, 76, 0.1),
     inset 0 1px 0 rgba(201, 168, 76, 0.18);
   position: relative;
+
 }
 
 .hero__card-badge {
@@ -226,14 +233,15 @@
 }
 
 .hero__card-img {
-  width: 100%;
-  height: 175px;
+  width:  400px;
+  height: 400px;
   object-fit: cover;
   display: block;
 }
 
 .hero__card-body {
   padding: 16px;
+   width: 100%;
 }
 
 .hero__card-location {
@@ -280,6 +288,7 @@
 
 /* ── Stats bar ── */
 .hero__stats {
+   width:100%;
   position: relative;
   z-index: 2;
   background: rgba(7, 5, 1, 0.93);
@@ -289,7 +298,7 @@
 
 .hero__stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
 }
 
 .hero__stat {
@@ -337,10 +346,54 @@
    RESPONSIVE
 ═══════════════════════════════════════════════ */
 @media (max-width: 1100px) {
-  .hero__card { width: 250px; }
+  .hero__card { width: 250px;  }
   .hero__deco--left  { left: 24px; }
   .hero__deco--right { right: 24px; }
+  
 }
+
+@media (max-width: 768px) {
+  .hero__title {
+    padding-top: 20%;
+    font-size: 2.8rem;
+    line-height: 1.05;
+  }
+
+  .hero__title-welcome {
+    font-size: 1rem;
+  }
+
+  .hero__title-brand {
+    font-size: 3rem;
+  }
+
+  .hero__title-estates {
+    font-size: 1.2rem;
+    letter-spacing: 0.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero__title {
+    padding-top: 20%;
+    font-size: 2.2rem;
+    line-height: 1.05;
+  }
+
+  .hero__title-brand {
+    font-size: 2.5rem;
+  }
+
+  .hero__title-estates {
+    font-size: 1rem;
+    letter-spacing: 0.2rem;
+  }
+
+  .hero__title-welcome {
+    font-size: 0.95rem;
+  }
+}
+
 
 @media (max-width: 900px) {
   .hero__card    { display: none; }

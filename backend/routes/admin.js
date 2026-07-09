@@ -7,6 +7,18 @@ const pool = require('../config/db');
 const JWT_SECRET =
   process.env.JWT_SECRET || 'milevia_jwt_secret_change_in_production';
 
+function parseJSON(val, fallback = []) {
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    try {
+      return JSON.parse(val);
+    } catch {
+      return fallback;
+    }
+  }
+  return fallback;
+}
+
 // ── Middleware: verify admin JWT ──────────────────────────────
 function requireAdmin(req, res, next) {
   const auth = req.headers.authorization;
@@ -108,6 +120,7 @@ router.get('/apartments', requireAdmin, async (req, res) => {
           : apt.amenities,
       images:
         typeof apt.images === 'string' ? JSON.parse(apt.images) : apt.images,
+      video_links: parseJSON(apt.video_links),
     }));
     res.json({ success: true, data: apartments });
   } catch (err) {
