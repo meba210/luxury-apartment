@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import {
   FaSignOutAlt, FaSearch, FaSort, FaSortUp, FaSortDown,
-  FaFileExcel, FaBuilding, FaChartBar, FaTimes, FaFilter
+  FaFileExcel, FaBuilding, FaChartBar, FaTimes, FaFilter,
+  FaHome, FaPlayCircle
 } from 'react-icons/fa'
 import './Dashboard.css'
 
@@ -32,7 +33,10 @@ export default function PartnerDashboard() {
   const navigate = useNavigate()
   const [partner, setPartner]   = useState(null)
   const [sales, setSales]       = useState([])
+  const [apartments, setApartments] = useState([])
   const [loading, setLoading]   = useState(true)
+  const [aptLoading, setAptLoading] = useState(false)
+  const [tab, setTab]           = useState('apartments')
   const [error, setError]       = useState('')
   const [search, setSearch]     = useState('')
   const [filterStatus, setFilterStatus] = useState('')
@@ -50,6 +54,18 @@ export default function PartnerDashboard() {
   }, [token, navigate])
 
   // ── Fetch sales ─────────────────────────────────────────────
+  const fetchApartments = useCallback(async () => {
+    setAptLoading(true)
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/apartments`);
+      setApartments(res.data.data || [])
+    } catch (err) {
+      console.error('Failed to fetch live apartments', err)
+    } finally {
+      setAptLoading(false)
+    }
+  }, [])
+
   const fetchSales = useCallback(async () => {
     if (!token) return
     setLoading(true)
@@ -81,7 +97,7 @@ export default function PartnerDashboard() {
     }
   }, [token, search, filterStatus, filterType, sortCol, sortDir, navigate])
 
-  useEffect(() => { fetchSales() }, [fetchSales])
+  useEffect(() => { fetchSales(); fetchApartments(); }, [fetchSales, fetchApartments])
 
   const handleSort = col => {
     if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -154,28 +170,49 @@ export default function PartnerDashboard() {
 
       <div className="dashboard__body">
 
-        {/* ── Stats ── */}
-        <div className="dashboard__stats">
-          <div className="dashboard__stat-card">
-            <div className="dashboard__stat-icon dashboard__stat-icon--blue"><FaBuilding /></div>
-            <div><span className="dashboard__stat-value">{stats.total}</span><span className="dashboard__stat-label">Total Properties</span></div>
-          </div>
-          <div className="dashboard__stat-card">
-            <div className="dashboard__stat-icon dashboard__stat-icon--green"><FaChartBar /></div>
-            <div><span className="dashboard__stat-value">{stats.active}</span><span className="dashboard__stat-label">Active Listings</span></div>
-          </div>
-          <div className="dashboard__stat-card">
-            <div className="dashboard__stat-icon dashboard__stat-icon--red"><FaBuilding /></div>
-            <div><span className="dashboard__stat-value">{stats.sold}</span><span className="dashboard__stat-label">Sold Properties</span></div>
-          </div>
-          <div className="dashboard__stat-card">
-            <div className="dashboard__stat-icon dashboard__stat-icon--gold"><FaChartBar /></div>
-            <div><span className="dashboard__stat-value">ETB {fmt(stats.avgPrice)}</span><span className="dashboard__stat-label">Average Price</span></div>
-          </div>
+        {/* ── Tabs ── */}
+        <div className="dashboard__tabs">
+          <button
+            className={`dashboard__tab ${tab === 'apartments' ? 'dashboard__tab--active' : ''}`}
+            onClick={() => setTab('apartments')}
+          >
+            <FaHome /> Live Apartments
+            <span className="dashboard__tab-count">{apartments.length}</span>
+          </button>
+          <button
+            className={`dashboard__tab ${tab === 'sales' ? 'dashboard__tab--active' : ''}`}
+            onClick={() => setTab('sales')}
+          >
+            <FaBuilding /> Sales Records
+            <span className="dashboard__tab-count">{sales.length}</span>
+          </button>
         </div>
 
+        {/* ── Stats ── */}
+        {tab === 'sales' && (
+          <div className="dashboard__stats">
+            <div className="dashboard__stat-card">
+              <div className="dashboard__stat-icon dashboard__stat-icon--blue"><FaBuilding /></div>
+              <div><span className="dashboard__stat-value">{stats.total}</span><span className="dashboard__stat-label">Total Properties</span></div>
+            </div>
+            <div className="dashboard__stat-card">
+              <div className="dashboard__stat-icon dashboard__stat-icon--green"><FaChartBar /></div>
+              <div><span className="dashboard__stat-value">{stats.active}</span><span className="dashboard__stat-label">Active Listings</span></div>
+            </div>
+            <div className="dashboard__stat-card">
+              <div className="dashboard__stat-icon dashboard__stat-icon--red"><FaBuilding /></div>
+              <div><span className="dashboard__stat-value">{stats.sold}</span><span className="dashboard__stat-label">Sold Properties</span></div>
+            </div>
+            <div className="dashboard__stat-card">
+              <div className="dashboard__stat-icon dashboard__stat-icon--gold"><FaChartBar /></div>
+              <div><span className="dashboard__stat-value">ETB {fmt(stats.avgPrice)}</span><span className="dashboard__stat-label">Average Price</span></div>
+            </div>
+          </div>
+        )}
+
         {/* ── Table ── */}
-        <div className="dashboard__table-card">
+        {tab === 'sales' && (
+          <div className="dashboard__table-card">
           <div className="dashboard__toolbar">
             <div className="dashboard__toolbar-left">
               <h3 className="dashboard__table-title">
@@ -258,6 +295,66 @@ export default function PartnerDashboard() {
             Showing {sales.length} properties · Data visible to approved MILEVIA partners only
           </div>
         </div>
+        )}
+
+        {/* ── Live Apartments Table ── */}
+        {tab === 'apartments' && (
+          <div className="dashboard__table-card">
+            <div className="dashboard__toolbar">
+              <div className="dashboard__toolbar-left">
+                <h3 className="dashboard__table-title">
+                  <FaHome /> Live Apartments
+                  <span className="dashboard__table-count">{apartments.length} listings</span>
+                </h3>
+              </div>
+            </div>
+            <div className="dashboard__table-wrap">
+              <table className="dashboard__table">
+                <thead>
+                  <tr>
+                    <th className="tbl-th">TITLE</th>
+                    <th className="tbl-th">LOCATION</th>
+                    <th className="tbl-th">TYPE</th>
+                    <th className="tbl-th tbl-th--num">BEDS</th>
+                    <th className="tbl-th tbl-th--num">BATHS</th>
+                    <th className="tbl-th tbl-th--num">PRICE (ETB)</th>
+                    <th className="tbl-th tbl-th--num">SIZE (m²)</th>
+                    <th className="tbl-th">MEDIA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {aptLoading ? (
+                    <tr><td colSpan={8} className="tbl-loading"><div className="tbl-spinner" /> Loading apartments...</td></tr>
+                  ) : apartments.length === 0 ? (
+                    <tr><td colSpan={8} className="tbl-empty">No live apartments available at the moment.</td></tr>
+                  ) : apartments.map((a, i) => (
+                    <tr key={a.id} className={`tbl-row ${i % 2 === 0 ? 'tbl-row--even' : ''}`}>
+                      <td className="tbl-td tbl-td--bold">{a.title}</td>
+                      <td className="tbl-td">{a.location_name || '—'}</td>
+                      <td className="tbl-td">{a.property_type || '—'}</td>
+                      <td className="tbl-td tbl-td--num">{a.bedrooms}</td>
+                      <td className="tbl-td tbl-td--num">{a.bathrooms}</td>
+                      <td className="tbl-td tbl-td--num"><span className="tbl-price">{fmt(a.price_etb)}</span></td>
+                      <td className="tbl-td tbl-td--num">{a.size_sqm ? Number(a.size_sqm).toFixed(0) : '—'}</td>
+                      <td className="tbl-td">
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>
+                            {Array.isArray(a.images) ? a.images.length : 0} Photos
+                          </span>
+                          {Array.isArray(a.video_links) && a.video_links.length > 0 && (
+                            <span style={{ fontSize: '0.85rem', color: '#10B981', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <FaPlayCircle /> {a.video_links.length} Video{a.video_links.length > 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -198,8 +198,15 @@
 
 .about-page__team-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr;
   gap: 20px;
+}
+
+.about-page__team-inner {
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+  gap: 40px;
+  align-items: center;
 }
 
 .about-page__team-card {
@@ -271,13 +278,17 @@
   .about-page__values-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .about-page__team-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .about-page__team-inner {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .about-page__story-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .about-page__team-inner {
     grid-template-columns: 1fr;
     gap: 32px;
   }
@@ -289,9 +300,6 @@
 
 @media (max-width: 560px) {
   .about-page__values-grid {
-    grid-template-columns: 1fr;
-  }
-  .about-page__team-grid {
     grid-template-columns: 1fr;
   }
   .about-page__story-stats {

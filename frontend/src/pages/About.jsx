@@ -142,24 +142,43 @@ export default function About() {
             <h2>MEET OUR CEO & FOUNDER</h2>
             <div className="gold-divider" />
           </div>
-          <div className="about-page__team-grid">
-            {team.map((member, i) => (
-              <div key={i} className="about-page__team-card">
-                <div className="about-page__team-img-wrap">
-                  <img
-                    src={normalizeImageUrl(member.img)}
-                    alt={member.name}
-                    className="about-page__team-img"
-                    loading="lazy"
-                  />
-                  <div className="about-page__team-overlay" />
+          <div className="about-page__team-inner">
+            <div className="about-page__team-grid">
+              {team.map((member, i) => (
+                <div key={i} className="about-page__team-card">
+                  <div className="about-page__team-img-wrap">
+                    <img
+                      src={normalizeImageUrl(member.img)}
+                      alt={member.name}
+                      className="about-page__team-img"
+                      loading="lazy"
+                    />
+                    <div className="about-page__team-overlay" />
+                  </div>
+                  <div className="about-page__team-info">
+                    <h4 className="about-page__team-name">{member.name}</h4>
+                    <span className="about-page__team-role">{member.role}</span>
+                  </div>
                 </div>
-                <div className="about-page__team-info">
-                  <h4 className="about-page__team-name">{member.name}</h4>
-                  <span className="about-page__team-role">{member.role}</span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="about-page__story-content">
+              <div className="gold-divider" style={{ margin: '12px 0' }} />
+              <p>
+                The founder of MILEVIA ESTATES is a visionary entrepreneur with a
+                passion for transforming the real estate experience in Ethiopia.
+                Through dedication, integrity, and a client-first approach, he
+                established MILEVIA ESTATES to connect buyers and sellers of
+                premium finished apartments with confidence and transparency.
+                Known for his strong work ethic, innovative marketing strategies,
+                and commitment to excellence, he has built a trusted brand focused
+                on delivering value, professionalism, and long-term relationships.
+                His vision is to make MILEVIA ESTATES the leading premium real
+                estate company in Addis Ababa, setting a new standard for quality
+                service and helping clients achieve their property goals with
+                confidence.
+              </p>
+            </div>
           </div>
         </div>
       </section>

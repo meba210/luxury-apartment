@@ -20,6 +20,7 @@ import {
   FaToggleOff,
   FaHome,
   FaComment,
+  FaEdit,
 } from 'react-icons/fa';
 import './Dashboard.css';
 
@@ -98,6 +99,7 @@ const BLANK_APT = {
   total_floors: '',
   amenities: [],
   images: '',
+  video_links: [],
   is_featured: false,
   is_available: true,
 };
@@ -161,6 +163,7 @@ export default function AdminDashboard() {
   const [aptSuccess, setAptSuccess] = useState('');
   const [aptLoading, setAptLoading] = useState(false);
   const [aptImgInput, setAptImgInput] = useState('');
+  const [aptVideoInput, setAptVideoInput] = useState('');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
 
   // ── fetch ─────────────────────────────────────────────────
@@ -245,6 +248,14 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleEditApt = (apt) => {
+    setAptForm({ ...apt });
+    setAptError('');
+    setAptSuccess('');
+    setTab('post');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleToggleApt = async (id, field, current) => {
     try {
       await axios.patch(
@@ -322,6 +333,20 @@ export default function AdminDashboard() {
     }));
   };
 
+  const handleAddVideo = () => {
+    const url = aptVideoInput.trim();
+    if (!url) return;
+    setAptForm((prev) => ({ ...prev, video_links: [...(prev.video_links || []), url] }));
+    setAptVideoInput('');
+  };
+
+  const handleRemoveVideo = (idx) => {
+    setAptForm((prev) => ({
+      ...prev,
+      video_links: prev.video_links.filter((_, i) => i !== idx),
+    }));
+  };
+
   const handlePostApartment = async (e) => {
     e.preventDefault();
     setAptError('');
@@ -341,17 +366,27 @@ export default function AdminDashboard() {
       const payload = {
         ...aptForm,
         images: Array.isArray(aptForm.images) ? aptForm.images : [],
+        video_links: Array.isArray(aptForm.video_links) ? aptForm.video_links : [],
       };
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/apartments`,
-        payload,
-        authH
-      );
-      setAptSuccess(
-        `Property "${aptForm.title}" posted successfully! (ID: ${res.data.id})`
-      );
+      let res;
+      if (aptForm.id) {
+        res = await axios.put(
+          `${import.meta.env.VITE_API_URL}/api/apartments/${aptForm.id}`,
+          payload,
+          authH
+        );
+        setAptSuccess(`Property "${aptForm.title}" updated successfully!`);
+      } else {
+        res = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/apartments`,
+          payload,
+          authH
+        );
+        setAptSuccess(`Property "${aptForm.title}" posted successfully! (ID: ${res.data.id})`);
+      }
       setAptForm(BLANK_APT);
       setAptImgInput('');
+      setAptVideoInput('');
       fetchAll();
       // auto-scroll to success
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -662,7 +697,7 @@ export default function AdminDashboard() {
                     <th className="tbl-th tbl-th--num">SIZE (m²)</th>
                     <th className="tbl-th">FEATURED</th>
                     <th className="tbl-th">AVAILABLE</th>
-                    <th className="tbl-th">DELETE</th>
+                    <th className="tbl-th">ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -727,13 +762,23 @@ export default function AdminDashboard() {
                           </button>
                         </td>
                         <td className="tbl-td">
-                          <button
-                            className="tbl-action-btn tbl-action-btn--delete"
-                            onClick={() => handleDeleteApt(a.id)}
-                            title="Delete"
-                          >
-                            <FaTrash />
-                          </button>
+                          <div className="tbl-actions" style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              className="tbl-action-btn tbl-action-btn--edit"
+                              style={{ color: '#C9A84C', background: 'rgba(201,168,76,0.1)', padding: '6px' }}
+                              onClick={() => handleEditApt(a)}
+                              title="Edit"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              className="tbl-action-btn tbl-action-btn--delete"
+                              onClick={() => handleDeleteApt(a.id)}
+                              title="Delete"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -858,7 +903,7 @@ export default function AdminDashboard() {
           <div className="dashboard__table-card">
             <div className="dashboard__toolbar">
               <h3 className="dashboard__table-title">
-                <FaPlus /> Post New Property Listing
+                <FaPlus /> {aptForm.id ? 'Edit Property Listing' : 'Post New Property Listing'}
               </h3>
               <p
                 style={{
@@ -1159,6 +1204,54 @@ export default function AdminDashboard() {
                     )}
                 </div>
 
+                {/* ── Video Links ── */}
+                <div className="apt-form__section">
+                  <h4 className="apt-form__section-title">Video Links</h4>
+                  <p className="apt-form__hint">
+                    Add YouTube, Vimeo, or direct video URLs.
+                  </p>
+                  <div className="apt-form__img-row">
+                    <input
+                      className="form-input"
+                      value={aptVideoInput}
+                      onChange={(e) => setAptVideoInput(e.target.value)}
+                      placeholder="e.g. https://youtube.com/watch?v=..."
+                      onKeyDown={(e) =>
+                        e.key === 'Enter' &&
+                        (e.preventDefault(), handleAddVideo())
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-gold btn-sm"
+                      onClick={handleAddVideo}
+                    >
+                      <FaPlus /> Add Video
+                    </button>
+                  </div>
+                  {Array.isArray(aptForm.video_links) &&
+                    aptForm.video_links.length > 0 && (
+                      <div className="apt-form__img-list" style={{ marginTop: '16px' }}>
+                        {aptForm.video_links.map((url, i) => (
+                          <div key={i} className="apt-form__img-item" style={{ padding: '8px', background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <div className="apt-form__img-info" style={{ marginLeft: 0 }}>
+                              <span className="apt-form__img-label">Video {i + 1}</span>
+                              <span className="apt-form__img-url">{url.slice(0, 60)}{url.length > 60 ? '...' : ''}</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="apt-form__img-remove"
+                              onClick={() => handleRemoveVideo(i)}
+                              style={{ position: 'relative', top: 0, right: 0 }}
+                            >
+                              <FaTimes />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                </div>
+
                 {/* ── Amenities ── */}
                 <div className="apt-form__section">
                   <h4 className="apt-form__section-title">Amenities</h4>
@@ -1230,7 +1323,7 @@ export default function AdminDashboard() {
                       <span className="auth-spinner" />
                     ) : (
                       <>
-                        <FaPlus /> Post Apartment
+                        <FaPlus /> {aptForm.id ? 'Update Apartment' : 'Post Apartment'}
                       </>
                     )}
                   </button>

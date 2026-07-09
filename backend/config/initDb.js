@@ -111,10 +111,10 @@ async function initializeDatabase() {
       { name: 'education_level', type: 'VARCHAR(100)' },
       { name: 'institution', type: 'VARCHAR(200)' },
       { name: 'field_of_study', type: 'VARCHAR(200)' },
-      { name: 'position', type: 'VARCHAR(200)' },
-      { name: 'real_estate_experience', type: 'TEXT' },
+      { name: 'company', type: 'VARCHAR(200)' },
+      { name: 'experience', type: 'TEXT' },
+      { name: 'message', type: 'TEXT' },
       { name: 'passion', type: 'TEXT' },
-      { name: 'reason_for_joining', type: 'TEXT' },
       { name: 'about', type: 'TEXT' },
     ];
 

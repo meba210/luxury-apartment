@@ -28,10 +28,10 @@ async function ensurePartnerColumns() {
     { name: 'education_level', type: 'VARCHAR(100)' },
     { name: 'institution', type: 'VARCHAR(200)' },
     { name: 'field_of_study', type: 'VARCHAR(200)' },
-    { name: 'position', type: 'VARCHAR(200)' },
-    { name: 'real_estate_experience', type: 'TEXT' },
+    { name: 'company', type: 'VARCHAR(200)' },
+    { name: 'experience', type: 'TEXT' },
+    { name: 'message', type: 'TEXT' },
     { name: 'passion', type: 'TEXT' },
-    { name: 'reason_for_joining', type: 'TEXT' },
     { name: 'about', type: 'TEXT' },
   ];
 
@@ -83,13 +83,11 @@ router.post('/register', async (req, res) => {
       institution,
       field_of_study,
       company,
-      position,
       experience,
-      real_estate_experience,
-      passion,
-      reason_for_joining,
-      about,
       message,
+      passion,
+      about,
+
       password,
     } = req.body;
 
@@ -133,9 +131,9 @@ router.post('/register', async (req, res) => {
     const [result] = await pool.execute(
       `INSERT INTO partners (
          full_name, email, phone, additional_phone, telegram_username, address, id_number,
-         dob, education_level, institution, field_of_study, company, position,
-         experience, real_estate_experience, passion, reason_for_joining, about, message, password_hash
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         dob, education_level, institution, field_of_study, company, 
+         experience,message, passion,  about,  password_hash
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         full_name,
         email,
@@ -149,13 +147,13 @@ router.post('/register', async (req, res) => {
         institution || null,
         field_of_study || null,
         company || null,
-        position || null,
+
         experience || null,
-        real_estate_experience || null,
+        message  || null,
         passion || null,
-        reason_for_joining || null,
+
         about || null,
-        message || reason_for_joining || null,
+
         hash,
       ]
     );

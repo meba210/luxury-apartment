@@ -2,7 +2,7 @@
   background: linear-gradient(180deg, var(--dark-2) 0%, var(--dark-3) 100%);
   padding: 50px 0;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .filterbar::before {

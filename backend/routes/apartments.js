@@ -1,91 +1,102 @@
 const express = require('express');
-const router = express.Router();
-const pool = require('../config/db');
-const { requireAdmin } = require('./admin');
+const router  = require('express').Router();
+const pool    = require('../config/db');
+const jwt     = require('jsonwebtoken');
 
-// Get all locations - must be before /:id to avoid conflict
+const JWT_SECRET = process.env.JWT_SECRET || 'milevia_jwt_secret_change_in_production';
+
+// ── Admin JWT guard ───────────────────────────────────────────
+function requireAdmin(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+  try {
+    const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Admin access required' });
+    }
+    req.admin = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ success: false, message: 'Invalid or expired token' });
+  }
+}
+
+// ── JSON helpers ──────────────────────────────────────────────
+function parseJSON(val, fallback = []) {
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    try { return JSON.parse(val); } catch { return fallback; }
+  }
+  return fallback;
+}
+
+function toJSONString(val) {
+  if (Array.isArray(val)) return JSON.stringify(val);
+  if (typeof val === 'string') {
+    try { JSON.parse(val); return val; } catch { /* fall */ }
+  }
+  return '[]';
+}
+
+function mapApt(apt) {
+  return {
+    ...apt,
+    amenities:   parseJSON(apt.amenities),
+    images:      parseJSON(apt.images),
+    video_links: parseJSON(apt.video_links),
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+// PUBLIC ROUTES
+// ══════════════════════════════════════════════════════════════
+
+// GET /api/apartments/meta/locations  — must be BEFORE /:id
 router.get('/meta/locations', async (req, res) => {
   try {
     const [rows] = await pool.execute('SELECT * FROM locations ORDER BY name');
     res.json({ success: true, data: rows });
-  } catch (error) {
-    console.error('Error fetching locations:', error);
-    res
-      .status(500)
-      .json({ success: false, message: 'Server error', error: error.message });
+  } catch (err) {
+    console.error('Locations error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// Get all apartments with optional filters
+// GET /api/apartments  — public listing (2+ beds, available)
 router.get('/', async (req, res) => {
   try {
-    const {
-      bedrooms,
-      location_id,
-      min_price,
-      max_price,
-      featured,
-      property_type,
-    } = req.query;
+    const { bedrooms, location_id, location_name,
+            min_price, max_price, featured, property_type } = req.query;
 
-    // Show all live properties with 2+ bedrooms, including apartments, duplexes and penthouses.
     let query = `
       SELECT a.*, l.name as location_name, l.description as location_description
       FROM apartments a
       LEFT JOIN locations l ON a.location_id = l.id
-      WHERE a.is_available = TRUE
-        AND a.bedrooms >= 2
+      WHERE a.is_available = TRUE AND a.bedrooms >= 2
     `;
     const params = [];
 
-    if (property_type) {
-      query += ' AND a.property_type = ?';
-      params.push(property_type);
-    }
-    if (bedrooms) {
-      query += ' AND a.bedrooms = ?';
-      params.push(parseInt(bedrooms));
-    }
-    if (location_id) {
-      query += ' AND a.location_id = ?';
-      params.push(parseInt(location_id));
-    }
-    if (min_price) {
-      query += ' AND a.price_etb >= ?';
-      params.push(parseFloat(min_price));
-    }
-    if (max_price) {
-      query += ' AND a.price_etb <= ?';
-      params.push(parseFloat(max_price));
-    }
-    if (featured === 'true') {
-      query += ' AND a.is_featured = TRUE';
-    }
+    if (property_type) { query += ' AND a.property_type = ?'; params.push(property_type); }
+    if (bedrooms)       { query += ' AND a.bedrooms = ?';      params.push(parseInt(bedrooms)); }
+    if (location_name)  { query += ' AND l.name = ?';          params.push(location_name); }
+    else if (location_id) { query += ' AND a.location_id = ?'; params.push(parseInt(location_id)); }
+    if (min_price)      { query += ' AND a.price_etb >= ?';    params.push(parseFloat(min_price)); }
+    if (max_price)      { query += ' AND a.price_etb <= ?';    params.push(parseFloat(max_price)); }
+    if (featured === 'true') { query += ' AND a.is_featured = TRUE'; }
 
     query += ' ORDER BY a.is_featured DESC, a.created_at DESC';
 
     const [rows] = await pool.execute(query, params);
-
-    const apartments = rows.map((apt) => ({
-      ...apt,
-      amenities:
-        typeof apt.amenities === 'string'
-          ? JSON.parse(apt.amenities)
-          : apt.amenities,
-      images:
-        typeof apt.images === 'string' ? JSON.parse(apt.images) : apt.images,
-    }));
-
-    res.json({ success: true, data: apartments, count: apartments.length });
-  } catch (error) {
-    console.error('Error fetching apartments:', error);
-    res
-      .status(500)
-      .json({ success: false, message: 'Server error', error: error.message });
+    res.json({ success: true, data: rows.map(mapApt), count: rows.length });
+  } catch (err) {
+    console.error('List apartments error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// Get single apartment
+// GET /api/apartments/:id  — single apartment (public)
 router.get('/:id', async (req, res) => {
   try {
     const [rows] = await pool.execute(
@@ -95,49 +106,103 @@ router.get('/:id', async (req, res) => {
        WHERE a.id = ?`,
       [req.params.id]
     );
-
     if (rows.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Apartment not found' });
+      return res.status(404).json({ success: false, message: 'Apartment not found' });
     }
-
-    const apt = rows[0];
-    apt.amenities =
-      typeof apt.amenities === 'string'
-        ? JSON.parse(apt.amenities)
-        : apt.amenities;
-    apt.images =
-      typeof apt.images === 'string' ? JSON.parse(apt.images) : apt.images;
-
-    res.json({ success: true, data: apt });
-  } catch (error) {
-    console.error('Error fetching apartment:', error);
-    res
-      .status(500)
-      .json({ success: false, message: 'Server error', error: error.message });
+    res.json({ success: true, data: mapApt(rows[0]) });
+  } catch (err) {
+    console.error('Get apartment error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// ── Admin: POST new apartment ─────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// ADMIN ROUTES (JWT protected)
+// ══════════════════════════════════════════════════════════════
+
+// POST /api/apartments  — create new apartment listing
 router.post('/', requireAdmin, async (req, res) => {
   try {
     const {
-      title,
-      description,
-      bedrooms,
-      bathrooms,
-      size_sqm,
-      price_etb,
-      price_usd,
-      property_type,
-      location_id,
-      floor,
-      total_floors,
-      amenities,
-      images,
-      is_featured,
-      is_available,
+      title, description, bedrooms, bathrooms,
+      size_sqm, price_etb, price_usd, property_type,
+      location_id, floor, total_floors,
+      amenities, images, video_links,
+      is_featured, is_available,
+    } = req.body;
+
+    if (!title || !bedrooms || !bathrooms || !price_etb) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title, bedrooms, bathrooms and price (ETB) are required.',
+      });
+    }
+    if (parseInt(bedrooms) < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Only apartments with 2 or more bedrooms are allowed.',
+      });
+    }
+
+    const validTypes = ['Apartment', 'Duplex', 'Penthouse'];
+    const propType   = validTypes.includes(property_type) ? property_type : 'Apartment';
+
+    const [result] = await pool.execute(
+      `INSERT INTO apartments
+         (title, description, bedrooms, bathrooms, size_sqm,
+          price_etb, price_usd, property_type,
+          location_id, floor, total_floors,
+          amenities, images, video_links,
+          is_featured, is_available)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        title.trim(),
+        description?.trim() || null,
+        parseInt(bedrooms),
+        parseInt(bathrooms),
+        size_sqm     ? parseFloat(size_sqm)    : null,
+        parseFloat(price_etb),
+        price_usd    ? parseFloat(price_usd)   : null,
+        propType,
+        location_id  ? parseInt(location_id)   : null,
+        floor        ? parseInt(floor)         : null,
+        total_floors ? parseInt(total_floors)  : null,
+        toJSONString(amenities),
+        toJSONString(images),
+        toJSONString(video_links),
+        is_featured  ? 1 : 0,
+        is_available !== false ? 1 : 0,
+      ]
+    );
+
+    const [newRows] = await pool.execute(
+      `SELECT a.*, l.name as location_name
+       FROM apartments a LEFT JOIN locations l ON a.location_id = l.id
+       WHERE a.id = ?`,
+      [result.insertId]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Apartment "${title}" posted successfully.`,
+      id:   result.insertId,
+      data: newRows.length ? mapApt(newRows[0]) : null,
+    });
+  } catch (err) {
+    console.error('Post apartment error:', err);
+    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+  }
+});
+
+// PUT /api/apartments/:id  — full edit (admin)
+router.put('/:id', requireAdmin, async (req, res) => {
+  try {
+    const {
+      title, description, bedrooms, bathrooms,
+      size_sqm, price_etb, price_usd, property_type,
+      location_id, floor, total_floors,
+      amenities, images, video_links,
+      is_featured, is_available,
     } = req.body;
 
     if (!title || !bedrooms || !bathrooms || !price_etb) {
@@ -149,105 +214,90 @@ router.post('/', requireAdmin, async (req, res) => {
     if (parseInt(bedrooms) < 2) {
       return res.status(400).json({
         success: false,
-        message: 'Only properties with 2 or more bedrooms are allowed.',
+        message: 'Only apartments with 2 or more bedrooms are allowed.',
       });
     }
 
-    const normalizedPropertyType = [
-      'Apartment',
-      'Duplex',
-      'Penthouse',
-    ].includes(property_type)
-      ? property_type
-      : 'Apartment';
+    const validTypes = ['Apartment', 'Duplex', 'Penthouse'];
+    const propType   = validTypes.includes(property_type) ? property_type : 'Apartment';
 
-    const amenitiesJson = Array.isArray(amenities)
-      ? JSON.stringify(amenities)
-      : amenities || '[]';
-    const imagesJson = Array.isArray(images)
-      ? JSON.stringify(images)
-      : images || '[]';
-
-    const [result] = await pool.execute(
-      `INSERT INTO apartments
-        (title, description, bedrooms, bathrooms, size_sqm, price_etb, price_usd,
-         property_type, location_id, floor, total_floors, amenities, images, is_featured, is_available)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    await pool.execute(
+      `UPDATE apartments SET
+         title = ?, description = ?, bedrooms = ?, bathrooms = ?, size_sqm = ?,
+         price_etb = ?, price_usd = ?, property_type = ?,
+         location_id = ?, floor = ?, total_floors = ?,
+         amenities = ?, images = ?, video_links = ?,
+         is_featured = ?, is_available = ?
+       WHERE id = ?`,
       [
-        title,
-        description || null,
+        title.trim(),
+        description?.trim() || null,
         parseInt(bedrooms),
         parseInt(bathrooms),
-        size_sqm ? parseFloat(size_sqm) : null,
+        size_sqm     ? parseFloat(size_sqm)    : null,
         parseFloat(price_etb),
-        price_usd ? parseFloat(price_usd) : null,
-        normalizedPropertyType,
-        location_id ? parseInt(location_id) : null,
-        floor ? parseInt(floor) : null,
-        total_floors ? parseInt(total_floors) : null,
-        amenitiesJson,
-        imagesJson,
-        is_featured ? 1 : 0,
+        price_usd    ? parseFloat(price_usd)   : null,
+        propType,
+        location_id  ? parseInt(location_id)   : null,
+        floor        ? parseInt(floor)         : null,
+        total_floors ? parseInt(total_floors)  : null,
+        toJSONString(amenities),
+        toJSONString(images),
+        toJSONString(video_links),
+        is_featured  ? 1 : 0,
         is_available !== false ? 1 : 0,
+        req.params.id,
       ]
     );
 
-    res.status(201).json({
+    const [updated] = await pool.execute(
+      `SELECT a.*, l.name as location_name
+       FROM apartments a LEFT JOIN locations l ON a.location_id = l.id
+       WHERE a.id = ?`,
+      [req.params.id]
+    );
+
+    res.json({
       success: true,
-      message: 'Property posted successfully.',
-      id: result.insertId,
+      message: 'Apartment updated successfully.',
+      data: updated.length ? mapApt(updated[0]) : null,
     });
-  } catch (error) {
-    console.error('Error posting apartment:', error);
-    res
-      .status(500)
-      .json({ success: false, message: 'Server error', error: error.message });
+  } catch (err) {
+    console.error('Edit apartment error:', err);
+    res.status(500).json({ success: false, message: 'Server error', error: err.message });
   }
 });
 
-// ── Admin: DELETE apartment ───────────────────────────────────
-router.delete('/:id', requireAdmin, async (req, res) => {
-  try {
-    await pool.execute('DELETE FROM apartments WHERE id = ?', [req.params.id]);
-    res.json({ success: true, message: 'Apartment deleted.' });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// ── Admin: PATCH apartment (toggle featured/available) ────────
+// PATCH /api/apartments/:id  — toggle featured / available only
 router.patch('/:id', requireAdmin, async (req, res) => {
   try {
     const { is_featured, is_available } = req.body;
     const updates = [];
-    const params = [];
-    if (is_featured !== undefined) {
-      updates.push('is_featured = ?');
-      params.push(is_featured ? 1 : 0);
+    const params  = [];
+
+    if (is_featured  !== undefined) { updates.push('is_featured = ?');  params.push(is_featured  ? 1 : 0); }
+    if (is_available !== undefined) { updates.push('is_available = ?'); params.push(is_available ? 1 : 0); }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ success: false, message: 'Nothing to update.' });
     }
-    if (is_available !== undefined) {
-      updates.push('is_available = ?');
-      params.push(is_available ? 1 : 0);
-    }
-    if (updates.length === 0)
-      return res
-        .status(400)
-        .json({ success: false, message: 'Nothing to update.' });
+
     params.push(req.params.id);
-    await pool.execute(
-      `UPDATE apartments SET ${updates.join(', ')} WHERE id = ?`,
-      params
-    );
+    await pool.execute(`UPDATE apartments SET ${updates.join(', ')} WHERE id = ?`, params);
     res.json({ success: true, message: 'Apartment updated.' });
-  } catch (error) {
-    if (
-      error.name === 'JsonWebTokenError' ||
-      error.name === 'TokenExpiredError'
-    ) {
-      return res
-        .status(401)
-        .json({ success: false, message: 'Invalid or expired token' });
-    }
+  } catch (err) {
+    console.error('Patch apartment error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// DELETE /api/apartments/:id
+router.delete('/:id', requireAdmin, async (req, res) => {
+  try {
+    await pool.execute('DELETE FROM apartments WHERE id = ?', [req.params.id]);
+    res.json({ success: true, message: 'Apartment deleted.' });
+  } catch (err) {
+    console.error('Delete apartment error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
