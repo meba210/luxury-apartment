@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { FaBars, FaTimes, FaUserTie } from 'react-icons/fa'
+import Logo from './Logo'
 import './Navbar.css'
 
 const navLinks = [
@@ -10,36 +11,7 @@ const navLinks = [
   { path: '/contact',    label: 'Contact Us' },
 ]
 
-function MileviaLogo({ size = 40 }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <rect width="100" height="100" rx="14" fill="#0D0D0D" />
-      <path
-        d="M14 72 L14 38 L36 62 L50 44 L64 62 L78 38 L78 52 L90 38"
-        stroke="#C9A84C"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-      <path
-        d="M82 28 L90 38 L80 40"
-        stroke="#C9A84C"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-    </svg>
-  )
-}
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -65,7 +37,7 @@ export default function Navbar() {
 
         {/* ── Logo ── */}
         <Link to="/" className="navbar__logo" aria-label="Milevia Estates — Home">
-          <MileviaLogo size={42} />
+          <Logo size={42} color="#C9A84C" />
           <div className="navbar__logo-text">
             <span className="navbar__logo-main">MILEVIA</span>
             <span className="navbar__logo-sub">ESTATES</span>

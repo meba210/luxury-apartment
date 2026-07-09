@@ -3,6 +3,7 @@ import { FaFacebook, FaInstagram, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, Fa
 import './Footer.css'
 import { FaTelegram } from 'react-icons/fa';
 import { FaTiktok } from 'react-icons/fa';
+import Logo from './Logo';
 
 export default function Footer() {
   return (
@@ -13,31 +14,7 @@ export default function Footer() {
             {/* Brand */}
             <div className="footer__brand">
               <div className="footer__logo">
-                <div className="footer__logo-icon">
-                  <svg
-                    viewBox="0 0 44 44"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <rect
-                      x="1"
-                      y="1"
-                      width="42"
-                      height="42"
-                      rx="3"
-                      stroke="#C9A84C"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M10 32V12L22 26L34 12V32"
-                      stroke="#C9A84C"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      fill="none"
-                    />
-                  </svg>
-                </div>
+                  <Logo size={42} color="#C9A84C" />
                 <div>
                   <span className="footer__logo-main">MILEVIA</span>
                   <span className="footer__logo-sub">ESTATES</span>

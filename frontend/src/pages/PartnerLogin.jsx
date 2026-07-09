@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa'
+import Logo from '../components/Logo'
 import './AuthPages.css'
 
 export default function PartnerLogin() {
@@ -36,10 +37,7 @@ export default function PartnerLogin() {
     <div className="auth-page auth-page--centered">
       <div className="auth-card">
         <div className="auth-card__header">
-          <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" width="44" height="44">
-            <rect x="1" y="1" width="42" height="42" rx="3" stroke="#C9A84C" strokeWidth="1.5"/>
-            <path d="M10 32V12L22 26L34 12V32" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <Logo size={44} color="#C9A84C" />
           <h2>Partner Login</h2>
           <p>Sign in to access the MILEVIA partner dashboard</p>
         </div>

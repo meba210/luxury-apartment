@@ -8,6 +8,7 @@ import FilterBar from '../components/FilterBar';
 import LocationSection from '../components/LocationSection';
 import ContactForm from '../components/ContactForm';
 import LoadingSpinner from '../components/LoadingSpinner';
+import Logo from '../components/Logo';
 import {
   FaArrowRight,
   FaStar,
@@ -275,29 +276,7 @@ export default function Home() {
             <div className="home__partner-badge">
               <div className="home__partner-badge-inner">
                 <div className="home__partner-badge-icon">
-                  <svg
-                    viewBox="0 0 44 44"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <rect
-                      x="1"
-                      y="1"
-                      width="42"
-                      height="42"
-                      rx="3"
-                      stroke="#C9A84C"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M10 32V12L22 26L34 12V32"
-                      stroke="#C9A84C"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      fill="none"
-                    />
-                  </svg>
+                  <Logo size={42} color="#C9A84C" />
                 </div>
                 <p className="home__partner-badge-text">GROW TOGETHER,</p>
                 <p className="home__partner-badge-text home__partner-badge-text--gold">

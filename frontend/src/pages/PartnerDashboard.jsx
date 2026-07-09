@@ -6,6 +6,7 @@ import {
   FaFileExcel, FaBuilding, FaChartBar, FaTimes, FaFilter,
   FaHome, FaPlayCircle
 } from 'react-icons/fa'
+import Logo from '../components/Logo'
 import './Dashboard.css'
 
 const STATUS_COLORS = {
@@ -146,10 +147,7 @@ export default function PartnerDashboard() {
       <div className="dashboard__topbar">
         <div className="dashboard__topbar-inner">
           <div className="dashboard__topbar-brand">
-            <svg viewBox="0 0 44 44" fill="none" width="32" height="32">
-              <rect x="1" y="1" width="42" height="42" rx="3" stroke="#C9A84C" strokeWidth="1.5"/>
-              <path d="M10 32V12L22 26L34 12V32" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <Logo size={32} color="#C9A84C" />
             <div>
               <span className="dashboard__topbar-name">MILEVIA ESTATES</span>
               <span className="dashboard__topbar-role">Partner Dashboard</span>

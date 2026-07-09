@@ -8,6 +8,7 @@ import {
   FaEyeSlash,
   FaArrowRight,
 } from 'react-icons/fa';
+import Logo from '../components/Logo';
 import './AuthPages.css';
 
 const perks = [
@@ -103,30 +104,7 @@ export default function PartnerRegister() {
         {/* Left panel */}
         <div className="auth-panel auth-panel--dark">
           <div className="auth-panel__logo">
-            <svg
-              viewBox="0 0 44 44"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              width="48"
-              height="48"
-            >
-              <rect
-                x="1"
-                y="1"
-                width="42"
-                height="42"
-                rx="3"
-                stroke="#C9A84C"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M10 32V12L22 26L34 12V32"
-                stroke="#C9A84C"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Logo size={48} color="#C9A84C" />
             <div>
               <span className="auth-panel__logo-main">MILEVIA</span>
               <span className="auth-panel__logo-sub">ESTATES</span>
