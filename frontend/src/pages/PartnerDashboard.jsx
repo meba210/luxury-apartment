@@ -318,13 +318,14 @@ export default function PartnerDashboard() {
                     <th className="tbl-th tbl-th--num">PRICE (ETB)</th>
                     <th className="tbl-th tbl-th--num">SIZE (m²)</th>
                     <th className="tbl-th">MEDIA</th>
+                    <th className="tbl-th">VIDEO LINKS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {aptLoading ? (
-                    <tr><td colSpan={8} className="tbl-loading"><div className="tbl-spinner" /> Loading apartments...</td></tr>
+                    <tr><td colSpan={9} className="tbl-loading"><div className="tbl-spinner" /> Loading apartments...</td></tr>
                   ) : apartments.length === 0 ? (
-                    <tr><td colSpan={8} className="tbl-empty">No live apartments available at the moment.</td></tr>
+                    <tr><td colSpan={9} className="tbl-empty">No live apartments available at the moment.</td></tr>
                   ) : apartments.map((a, i) => (
                     <tr key={a.id} className={`tbl-row ${i % 2 === 0 ? 'tbl-row--even' : ''}`}>
                       <td className="tbl-td tbl-td--bold">{a.title}</td>
@@ -345,6 +346,27 @@ export default function PartnerDashboard() {
                             </span>
                           )}
                         </div>
+                      </td>
+                      <td className="tbl-td tbl-td--links">
+                        {Array.isArray(a.video_links) && a.video_links.length > 0 ? (
+                          <div className="tbl-link-list">
+                            {a.video_links.map((url, idx) => (
+                              <a
+                                key={`${url}-${idx}`}
+                                href={url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="tbl-video-link"
+                                title={url}
+                              >
+                                <FaPlayCircle />
+                                <span>{url}</span>
+                              </a>
+                            ))}
+                          </div>
+                        ) : (
+                          '-'
+                        )}
                       </td>
                     </tr>
                   ))}

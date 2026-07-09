@@ -21,6 +21,7 @@ import {
   FaHome,
   FaComment,
   FaEdit,
+  FaPlayCircle,
 } from 'react-icons/fa';
 import './Dashboard.css';
 
@@ -336,7 +337,10 @@ export default function AdminDashboard() {
   const handleAddVideo = () => {
     const url = aptVideoInput.trim();
     if (!url) return;
-    setAptForm((prev) => ({ ...prev, video_links: [...(prev.video_links || []), url] }));
+    setAptForm((prev) => ({
+      ...prev,
+      video_links: [...(prev.video_links || []), url],
+    }));
     setAptVideoInput('');
   };
 
@@ -366,7 +370,9 @@ export default function AdminDashboard() {
       const payload = {
         ...aptForm,
         images: Array.isArray(aptForm.images) ? aptForm.images : [],
-        video_links: Array.isArray(aptForm.video_links) ? aptForm.video_links : [],
+        video_links: Array.isArray(aptForm.video_links)
+          ? aptForm.video_links
+          : [],
       };
       let res;
       if (aptForm.id) {
@@ -382,7 +388,9 @@ export default function AdminDashboard() {
           payload,
           authH
         );
-        setAptSuccess(`Property "${aptForm.title}" posted successfully! (ID: ${res.data.id})`);
+        setAptSuccess(
+          `Property "${aptForm.title}" posted successfully! (ID: ${res.data.id})`
+        );
       }
       setAptForm(BLANK_APT);
       setAptImgInput('');
@@ -695,6 +703,7 @@ export default function AdminDashboard() {
                     <th className="tbl-th tbl-th--num">BEDS</th>
                     <th className="tbl-th tbl-th--num">PRICE (ETB)</th>
                     <th className="tbl-th tbl-th--num">SIZE (m²)</th>
+                    <th className="tbl-th">VIDEO LINKS</th>
                     <th className="tbl-th">FEATURED</th>
                     <th className="tbl-th">AVAILABLE</th>
                     <th className="tbl-th">ACTIONS</th>
@@ -703,14 +712,14 @@ export default function AdminDashboard() {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={8} className="tbl-loading">
+                      <td colSpan={9} className="tbl-loading">
                         <div className="tbl-spinner" />
                         Loading...
                       </td>
                     </tr>
                   ) : apartments.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="tbl-empty">
+                      <td colSpan={9} className="tbl-empty">
                         No apartments yet. Use "Post New Apartment" to add one.
                       </td>
                     </tr>
@@ -728,6 +737,28 @@ export default function AdminDashboard() {
                         </td>
                         <td className="tbl-td tbl-td--num">
                           {a.size_sqm ? Number(a.size_sqm).toFixed(0) : '—'}
+                        </td>
+                        <td className="tbl-td tbl-td--links">
+                          {Array.isArray(a.video_links) &&
+                          a.video_links.length > 0 ? (
+                            <div className="tbl-link-list">
+                              {a.video_links.map((url, idx) => (
+                                <a
+                                  key={`${url}-${idx}`}
+                                  href={url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="tbl-video-link"
+                                  title={url}
+                                >
+                                  <FaPlayCircle />
+                                  <span>{url}</span>
+                                </a>
+                              ))}
+                            </div>
+                          ) : (
+                            '-'
+                          )}
                         </td>
                         <td className="tbl-td">
                           <button
@@ -762,10 +793,17 @@ export default function AdminDashboard() {
                           </button>
                         </td>
                         <td className="tbl-td">
-                          <div className="tbl-actions" style={{ display: 'flex', gap: '8px' }}>
+                          <div
+                            className="tbl-actions"
+                            style={{ display: 'flex', gap: '8px' }}
+                          >
                             <button
                               className="tbl-action-btn tbl-action-btn--edit"
-                              style={{ color: '#C9A84C', background: 'rgba(201,168,76,0.1)', padding: '6px' }}
+                              style={{
+                                color: '#C9A84C',
+                                background: 'rgba(201,168,76,0.1)',
+                                padding: '6px',
+                              }}
                               onClick={() => handleEditApt(a)}
                               title="Edit"
                             >
@@ -903,7 +941,10 @@ export default function AdminDashboard() {
           <div className="dashboard__table-card">
             <div className="dashboard__toolbar">
               <h3 className="dashboard__table-title">
-                <FaPlus /> {aptForm.id ? 'Edit Property Listing' : 'Post New Property Listing'}
+                <FaPlus />{' '}
+                {aptForm.id
+                  ? 'Edit Property Listing'
+                  : 'Post New Property Listing'}
               </h3>
               <p
                 style={{
@@ -1231,12 +1272,36 @@ export default function AdminDashboard() {
                   </div>
                   {Array.isArray(aptForm.video_links) &&
                     aptForm.video_links.length > 0 && (
-                      <div className="apt-form__img-list" style={{ marginTop: '16px' }}>
+                      <div
+                        className="apt-form__img-list"
+                        style={{ marginTop: '16px' }}
+                      >
                         {aptForm.video_links.map((url, i) => (
-                          <div key={i} className="apt-form__img-item" style={{ padding: '8px', background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <div className="apt-form__img-info" style={{ marginLeft: 0 }}>
-                              <span className="apt-form__img-label">Video {i + 1}</span>
-                              <span className="apt-form__img-url">{url.slice(0, 60)}{url.length > 60 ? '...' : ''}</span>
+                          <div
+                            key={i}
+                            className="apt-form__img-item"
+                            style={{
+                              padding: '8px',
+                              background: '#F9FAFB',
+                              border: '1px solid #E5E7EB',
+                              borderRadius: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '8px',
+                            }}
+                          >
+                            <div
+                              className="apt-form__img-info"
+                              style={{ marginLeft: 0 }}
+                            >
+                              <span className="apt-form__img-label">
+                                Video {i + 1}
+                              </span>
+                              <span className="apt-form__img-url">
+                                {url.slice(0, 60)}
+                                {url.length > 60 ? '...' : ''}
+                              </span>
                             </div>
                             <button
                               type="button"
@@ -1323,7 +1388,8 @@ export default function AdminDashboard() {
                       <span className="auth-spinner" />
                     ) : (
                       <>
-                        <FaPlus /> {aptForm.id ? 'Update Apartment' : 'Post Apartment'}
+                        <FaPlus />{' '}
+                        {aptForm.id ? 'Update Apartment' : 'Post Apartment'}
                       </>
                     )}
                   </button>

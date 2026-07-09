@@ -611,6 +611,39 @@
   font-size: 0.78rem;
 }
 
+.tbl-td--links {
+  min-width: 220px;
+  max-width: 320px;
+  white-space: normal;
+}
+
+.tbl-link-list {
+  display: grid;
+  gap: 6px;
+}
+
+.tbl-video-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  color: #047857;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tbl-video-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tbl-video-link:hover {
+  color: #065f46;
+  text-decoration: underline;
+}
+
 .tbl-price {
   font-weight: 700;
   color: #111827;
