@@ -154,7 +154,7 @@
 
 /* Price */
 .apt-card__price {
-  font-family: 'Playfair Display', serif;
+  font-family: 'normal';
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--gold);

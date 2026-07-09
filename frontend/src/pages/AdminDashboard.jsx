@@ -23,6 +23,7 @@ import {
   FaEdit,
   FaPlayCircle,
 } from 'react-icons/fa';
+import Logo from '../components/Logo';
 import './Dashboard.css';
 
 // ── helpers ──────────────────────────────────────────────────
@@ -74,6 +75,30 @@ const LOCATIONS_STATIC = [
 function fmt(n) {
   if (!n && n !== 0) return '—';
   return new Intl.NumberFormat('en-ET').format(n);
+}
+
+function getVideoLinks(apt) {
+  const value = apt?.video_links ?? apt?.videoLinks ?? apt?.videos ?? [];
+  const cleanLinks = (links) =>
+    links
+      .map((url) =>
+        String(url)
+          .trim()
+          .replace(/^[\s[\]"']+|[\s[\]"']+$/g, '')
+      )
+      .filter((url) => /^https?:\/\//i.test(url));
+
+  if (Array.isArray(value)) return cleanLinks(value);
+  if (typeof value !== 'string') return [];
+
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return cleanLinks(parsed);
+  } catch {
+    // Fall back to a plain URL or comma-separated text saved by older data.
+  }
+
+  return cleanLinks(value.split(','));
 }
 
 function SortIcon({ col, sortCol, sortDir }) {
@@ -564,24 +589,7 @@ export default function AdminDashboard() {
       <div className="dashboard__topbar dashboard__topbar--admin">
         <div className="dashboard__topbar-inner">
           <div className="dashboard__topbar-brand">
-            <svg viewBox="0 0 44 44" fill="none" width="32" height="32">
-              <rect
-                x="1"
-                y="1"
-                width="42"
-                height="42"
-                rx="3"
-                stroke="#C9A84C"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M10 32V12L22 26L34 12V32"
-                stroke="#C9A84C"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Logo size={32} color="#C9A84C" />
             <div>
               <span className="dashboard__topbar-name">MILEVIA ESTATES</span>
               <span className="dashboard__topbar-role">Admin Dashboard</span>
@@ -739,10 +747,9 @@ export default function AdminDashboard() {
                           {a.size_sqm ? Number(a.size_sqm).toFixed(0) : '—'}
                         </td>
                         <td className="tbl-td tbl-td--links">
-                          {Array.isArray(a.video_links) &&
-                          a.video_links.length > 0 ? (
+                          {getVideoLinks(a).length > 0 ? (
                             <div className="tbl-link-list">
-                              {a.video_links.map((url, idx) => (
+                              {getVideoLinks(a).map((url, idx) => (
                                 <a
                                   key={`${url}-${idx}`}
                                   href={url}

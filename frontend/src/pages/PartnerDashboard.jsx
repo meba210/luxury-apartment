@@ -23,6 +23,30 @@ function fmt(n) {
   return new Intl.NumberFormat('en-ET').format(n)
 }
 
+function getVideoLinks(apt) {
+  const value = apt?.video_links ?? apt?.videoLinks ?? apt?.videos ?? []
+  const cleanLinks = (links) =>
+    links
+      .map((url) =>
+        String(url)
+          .trim()
+          .replace(/^[\s[\]"']+|[\s[\]"']+$/g, '')
+      )
+      .filter((url) => /^https?:\/\//i.test(url))
+
+  if (Array.isArray(value)) return cleanLinks(value)
+  if (typeof value !== 'string') return []
+
+  try {
+    const parsed = JSON.parse(value)
+    if (Array.isArray(parsed)) return cleanLinks(parsed)
+  } catch {
+    // Fall back to a plain URL or comma-separated text saved by older data.
+  }
+
+  return cleanLinks(value.split(','))
+}
+
 function SortIcon({ col, sortCol, sortDir }) {
   if (sortCol !== col) return <FaSort className="tbl-sort-icon tbl-sort-icon--inactive" />
   return sortDir === 'asc'
@@ -340,17 +364,17 @@ export default function PartnerDashboard() {
                           <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>
                             {Array.isArray(a.images) ? a.images.length : 0} Photos
                           </span>
-                          {Array.isArray(a.video_links) && a.video_links.length > 0 && (
+                          {getVideoLinks(a).length > 0 && (
                             <span style={{ fontSize: '0.85rem', color: '#10B981', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <FaPlayCircle /> {a.video_links.length} Video{a.video_links.length > 1 ? 's' : ''}
+                              <FaPlayCircle /> {getVideoLinks(a).length} Video{getVideoLinks(a).length > 1 ? 's' : ''}
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="tbl-td tbl-td--links">
-                        {Array.isArray(a.video_links) && a.video_links.length > 0 ? (
+                        {getVideoLinks(a).length > 0 ? (
                           <div className="tbl-link-list">
-                            {a.video_links.map((url, idx) => (
+                            {getVideoLinks(a).map((url, idx) => (
                               <a
                                 key={`${url}-${idx}`}
                                 href={url}
