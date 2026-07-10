@@ -199,7 +199,6 @@ export default function ApartmentModal({ apartment, onClose }) {
                 <FaMapMarkerAlt /> {apartment.location_name}
               </div>
               <h2 className="modal__title">{apartment.title}</h2>
-
               <div className="modal__price-block">
                 <span className="modal__price-etb">ETB {formatETB(apartment.price_etb)}</span>
                 {apartment.price_usd && (
