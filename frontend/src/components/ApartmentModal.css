@@ -17,11 +17,13 @@
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 960px;
-  max-height: 90vh;
-  overflow: hidden;
+  height: auto;
+  max-height: 95vh;
+overflow-y: auto;
   position: relative;
  
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(201,168,76,0.15);
+  /* padding-bottom: 250px; */
 }
 
 .modal__close {
@@ -181,12 +183,12 @@
 .modal__details {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .modal__details-scroll {
-  flex: 1;
-  overflow-y: auto;
+   flex: none;
+  overflow: visible;
   padding: 28px 24px 16px;
 }
 
@@ -459,7 +461,7 @@
   flex: 1;
   min-width: 0;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
 }
 
