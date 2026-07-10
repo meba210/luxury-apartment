@@ -8,6 +8,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
+ 
 }
 
 .modal {
@@ -19,6 +20,7 @@
   max-height: 90vh;
   overflow: hidden;
   position: relative;
+ 
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(201,168,76,0.15);
 }
 
@@ -381,4 +383,274 @@
   .modal__specs {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* ══════════════════════════════════════════════
+   VIDEO LINKS — gallery panel (below thumbnails)
+══════════════════════════════════════════════ */
+.modal__videos {
+  background: var(--dark-3);
+  border-top: 1px solid var(--border);
+  padding: 12px 12px 10px;
+  flex-shrink: 0;
+}
+
+.modal__videos-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.modal__videos-icon {
+  font-size: 0.85rem;
+}
+
+.modal__videos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Each video link in the gallery panel */
+.modal__video-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--video-color, var(--gold));
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.modal__video-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--video-color, var(--gold));
+  transform: translateX(3px);
+}
+
+.modal__video-btn-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--video-color, var(--gold));
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
+.modal__video-btn-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--white);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal__video-btn-ext {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.modal__video-btn:hover .modal__video-btn-ext {
+  color: var(--video-color, var(--gold));
+}
+
+/* ══════════════════════════════════════════════
+   VIDEO LINKS — details panel (right side)
+══════════════════════════════════════════════ */
+.modal__detail-videos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.modal__detail-video-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: rgba(201, 168, 76, 0.05);
+  border: 1px solid rgba(201, 168, 76, 0.18);
+  border-left: 3px solid var(--video-color, var(--gold));
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: var(--transition);
+  color: var(--white);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.modal__detail-video-btn:hover {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: var(--video-color, var(--gold));
+  transform: translateX(3px);
+  color: var(--gold-light);
+}
+
+.modal__detail-video-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--video-color, var(--gold));
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.modal__detail-video-btn:hover .modal__detail-video-play {
+  transform: scale(1.1);
+}
+
+/* ══════════════════════════════════════════════
+   VIDEO LINKS — shown under description
+══════════════════════════════════════════════ */
+
+/* Section wrapper */
+.modal__section--videos {
+  background: rgba(42, 171, 238, 0.04);
+  border: 1px solid rgba(42, 171, 238, 0.18);
+  border-radius: var(--radius-md);
+  padding: 14px 16px 16px;
+  margin-bottom: 16px;
+}
+
+/* Section title with telegram icon */
+.modal__section-title--videos {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #2AABEE !important;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+}
+
+.modal__video-section-icon {
+  font-size: 1rem;
+  color: #2AABEE;
+  flex-shrink: 0;
+}
+
+/* Small hint text */
+.modal__video-section-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* Container for all video link buttons */
+.modal__video-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Individual video link button */
+.modal__video-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--vlink-bg, rgba(201,168,76,0.08));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3px solid var(--vlink-color, #C9A84C);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.22s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal__video-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--vlink-color, #C9A84C);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.modal__video-link:hover {
+  border-color: var(--vlink-color, #C9A84C);
+  transform: translateX(4px);
+  box-shadow: -3px 0 12px rgba(0,0,0,0.2);
+}
+
+.modal__video-link:hover::before {
+  opacity: 0.06;
+}
+
+/* Play / Telegram icon circle */
+.modal__video-link__icon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--vlink-color, #C9A84C);
+  color: #fff;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: transform 0.22s ease;
+}
+
+.modal__video-link:hover .modal__video-link__icon {
+  transform: scale(1.1);
+}
+
+/* Label text */
+.modal__video-link__label {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+
+/* External link icon */
+.modal__video-link__ext {
+  position: relative;
+  z-index: 1;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.modal__video-link:hover .modal__video-link__ext {
+  color: var(--vlink-color, #C9A84C);
+  transform: translate(2px, -2px);
 }
