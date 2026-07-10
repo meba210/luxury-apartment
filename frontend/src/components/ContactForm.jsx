@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { FaPaperPlane, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'
 import './ContactForm.css'
-
-export default function ContactForm({ apartments = [], preselectedId = null, preselectedTitle = null }) {
+import ApartmentModal from '../components/ApartmentModal';
+import { useLocation } from 'react-router-dom';
+export default function ContactForm({ apartments: propApartments, preselectedId = null, preselectedTitle = null }) {
   const [form, setForm] = useState({
     full_name: '',
     email: '',
@@ -11,12 +12,33 @@ export default function ContactForm({ apartments = [], preselectedId = null, pre
     apartment_id: preselectedId || '',
     message: preselectedTitle ? `I'm interested in: ${preselectedTitle}` : '',
   })
-  const [status, setStatus] = useState(null) // 'loading' | 'success' | 'error'
-  const [error, setError] = useState('')
+  const [status, setStatus] = useState(null)   // 'loading' | 'success' | 'error'
+  const [error, setError]   = useState('')
+// const [selectedApt, setSelectedApt] = useState(null);
+//   const [allApts, setAllApts] = useState([]);
+  // ── Fetch live apartments when none are passed in as a prop ──
+const apartments = propApartments || [];
 
-  const handleChange = e => {
-    setForm(p => ({ ...p, [e.target.name]: e.target.value }))
-  }
+  useEffect(() => {
+    if (propApartments?.length) return;
+
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/api/apartments`)
+      .then((res) => setApartments(res.data.data || []))
+      .catch(console.error);
+  }, [propApartments]);
+
+  // Keep preselected values in sync if parent changes them (e.g. from modal)
+  useEffect(() => {
+    if (preselectedId) {
+      setForm(p => ({ ...p, apartment_id: preselectedId }))
+    }
+    if (preselectedTitle) {
+      setForm(p => ({ ...p, message: `I'm interested in: ${preselectedTitle}` }))
+    }
+  }, [preselectedId, preselectedTitle])
+
+  const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -27,7 +49,7 @@ export default function ContactForm({ apartments = [], preselectedId = null, pre
     setStatus('loading')
     setError('')
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/inquiries`, form)
+      await axios.post('/api/inquiries', form)
       setStatus('success')
       setForm({ full_name: '', email: '', phone: '', apartment_id: '', message: '' })
     } catch {
@@ -98,12 +120,27 @@ export default function ContactForm({ apartments = [], preselectedId = null, pre
         </div>
         <div className="form-group">
           <label className="form-label">Property of Interest</label>
-          <select name="apartment_id" value={form.apartment_id} onChange={handleChange} className="form-select">
+          <select
+            name="apartment_id"
+            value={form.apartment_id}
+            onChange={handleChange}
+            className="form-select"
+          >
             <option value="">Select a property (optional)</option>
-            {apartments.map(apt => (
-              <option key={apt.id} value={apt.id}>{apt.title}</option>
+
+            {apartments.map((apt) => (
+              <option key={apt.id} value={apt.id}>
+                {apt.title}
+                {apt.location_name ? ` — ${apt.location_name}` : ''}
+              </option>
             ))}
           </select>
+          {/* {selectedApt && (
+            <ApartmentModal
+              apartment={selectedApt}
+              onClose={() => setSelectedApt(null)}
+            />
+          )} */}
         </div>
       </div>
 
@@ -120,13 +157,19 @@ export default function ContactForm({ apartments = [], preselectedId = null, pre
         />
       </div>
 
-      <button type="submit" className="btn btn-gold btn-lg contact-form__submit" disabled={status === 'loading'}>
+      <button
+        type="submit"
+        className="btn btn-gold btn-lg contact-form__submit"
+        disabled={status === 'loading'}
+      >
         {status === 'loading' ? (
           <span className="contact-form__spinner" />
         ) : (
-          <><FaPaperPlane /> Send Inquiry</>
+          <>
+            <FaPaperPlane /> Send Inquiry
+          </>
         )}
       </button>
     </form>
-  )
+  );
 }

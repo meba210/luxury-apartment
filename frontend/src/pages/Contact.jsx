@@ -9,6 +9,8 @@ import {
 } from 'react-icons/fa';
 import './Contact.css';
 
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 const contactDetails = [
   {
     icon: <FaPhone />,
@@ -34,7 +36,14 @@ const contactDetails = [
 export default function Contact() {
   const location = useLocation();
   const state = location.state || {};
+const [apartments, setApartments] = useState([]);
 
+useEffect(() => {
+  axios
+    .get(`${import.meta.env.VITE_API_URL}/api/apartments`)
+    .then((res) => setApartments(res.data.data || []))
+    .catch(console.error);
+}, []);
   return (
     <div className="contact-page">
       {/* Header */}
@@ -111,6 +120,7 @@ export default function Contact() {
                 <p>Fill out the form and our team will contact you shortly.</p>
               </div>
               <ContactForm
+                apartments={apartments}
                 preselectedId={state.apartmentId}
                 preselectedTitle={state.apartmentTitle}
               />
