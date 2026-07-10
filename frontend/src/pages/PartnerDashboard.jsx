@@ -2,10 +2,20 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import {
-  FaSignOutAlt, FaSearch, FaSort, FaSortUp, FaSortDown,
-  FaFileExcel, FaBuilding, FaChartBar, FaTimes, FaFilter,
-  FaHome, FaPlayCircle
-} from 'react-icons/fa'
+  FaSignOutAlt,
+  FaSearch,
+  FaSort,
+  FaSortUp,
+  FaSortDown,
+  FaFileExcel,
+  FaBuilding,
+  FaChartBar,
+  FaTimes,
+  FaFilter,
+  FaHome,
+  FaPlayCircle,
+  FaTelegramPlane
+} from 'react-icons/fa';
 import Logo from '../components/Logo'
 import './Dashboard.css'
 
@@ -383,8 +393,8 @@ export default function PartnerDashboard() {
                                 className="tbl-video-link"
                                 title={url}
                               >
-                                <FaPlayCircle />
-                                <span>{url}</span>
+                               <FaTelegramPlane className="tbl-video-link__icon" />
+                                  <span>video Link</span>
                               </a>
                             ))}
                           </div>

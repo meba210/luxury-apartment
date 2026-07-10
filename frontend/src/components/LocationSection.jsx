@@ -1,11 +1,11 @@
 import { FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa'
 import './LocationSection.css'
-
+import bole from '../assets/bole.jpg'
 const locations = [
   {
     name: 'Bole Rwanda',
     desc: 'Upscale diplomatic zone with luxury residences',
-    img: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80',
+    img: bole,
     count: 4,
     id: 1,
   },

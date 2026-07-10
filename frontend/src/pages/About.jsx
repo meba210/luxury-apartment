@@ -9,6 +9,7 @@ import {
 import founderImage from '../assets/photo_2026-07-01_19-31-18.jpg';
 import { normalizeImageUrl } from '../utils/normalizeImageUrl';
 import './About.css';
+import cityimage from '../assets/cityimage.jpg';
 
 const values = [
   {
@@ -69,7 +70,7 @@ export default function About() {
           <div className="about-page__story-inner">
             <div className="about-page__story-img-wrap">
               <img
-                src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=700&q=80"
+              src = {cityimage}
                 alt="Addis Ababa skyline"
                 className="about-page__story-img"
               />
@@ -98,10 +99,10 @@ export default function About() {
               </p>
               <div className="about-page__story-stats">
                 {[
-                  { val: '150+', lbl: 'Properties Listed' },
-                  { val: '200+', lbl: 'Happy Clients' },
+                  { val: '40+', lbl: 'Properties Listed' },
+                  { val: '30+', lbl: 'Happy Clients' },
                   { val: '6', lbl: 'Prime Locations' },
-                  { val: '25+', lbl: 'Partner Agents' },
+                  { val: '200+', lbl: 'Partner Agents' },
                 ].map((s, i) => (
                   <div key={i} className="about-page__story-stat">
                     <span className="about-page__story-stat-val">{s.val}</span>

@@ -21,6 +21,7 @@ import {
   FaHome,
   FaComment,
   FaEdit,
+  FaTelegramPlane,
   FaPlayCircle,
 } from 'react-icons/fa';
 import Logo from '../components/Logo';
@@ -758,8 +759,9 @@ export default function AdminDashboard() {
                                   className="tbl-video-link"
                                   title={url}
                                 >
-                                  <FaPlayCircle />
-                                  <span>{url}</span>
+                                  {/* <FaPlayCircle /> */}
+                                  <FaTelegramPlane className="tbl-video-link__icon" />
+                                  <span>video Link</span>
                                 </a>
                               ))}
                             </div>
