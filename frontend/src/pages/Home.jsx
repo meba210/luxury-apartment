@@ -300,7 +300,7 @@ export default function Home() {
           <div className="home__stats-banner-grid">
             {[
               {
-                value: '150+',
+                value: '40+',
                 label: 'Premium Properties',
                 sub: 'Across Addis Ababa',
               },
@@ -309,7 +309,7 @@ export default function Home() {
                 label: 'Prime Locations',
                 sub: 'In the best neighborhoods',
               },
-              { value: '50+', label: 'Happy Residents', sub: 'And counting' },
+              { value: '30+', label: 'Happy Residents', sub: 'And counting' },
               {
                 value: '5★',
                 label: 'Client Rating',

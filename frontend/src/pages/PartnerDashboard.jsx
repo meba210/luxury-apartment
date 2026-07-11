@@ -64,6 +64,28 @@ function SortIcon({ col, sortCol, sortDir }) {
     : <FaSortDown className="tbl-sort-icon tbl-sort-icon--active" />
 }
 
+const fallbackLocations = [
+  { id: 1, name: 'Bole' },
+  { id: 2, name: 'Megenagna' },
+  { id: 3, name: 'Mexico' },
+  { id: 4, name: 'Kazanchis' },
+  { id: 5, name: 'CMC' },
+  { id: 6, name: 'Sarbet' },
+  { id: 7, name: '6 Killo' },
+  { id: 8, name: 'Arada' },
+  { id: 9, name: 'Piazza' },
+  { id: 10, name: 'Nifas Silk' },
+  { id: 11, name: 'Ayat' },
+  { id: 12, name: 'Gerji' },
+  { id: 13, name: 'Lebu' },
+  { id: 14, name: 'Lideta' },
+  { id: 15, name: 'Atlas' },
+  { id: 16, name: 'Old Airport' },
+  { id: 17, name: 'Jemo' },
+  { id: 18, name: 'Bole Wolo Sefer' },
+  { id: 19, name: 'Hilton Area' },
+  { id: 20, name: 'Summit' },
+];
 export default function PartnerDashboard() {
   const navigate = useNavigate()
   const [partner, setPartner]   = useState(null)
@@ -78,15 +100,34 @@ export default function PartnerDashboard() {
   const [filterType, setFilterType]     = useState('')
   const [sortCol, setSortCol]   = useState('created_at')
   const [sortDir, setSortDir]   = useState('desc')
-
+  const [local, setLocal] = useState({
+    location_id: '',
+    location_name: '',
+  });
+    const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const token = localStorage.getItem('partner_token')
-
+  const [locations, setLocations] = useState(fallbackLocations);
   // ── Auth guard ──────────────────────────────────────────────
   useEffect(() => {
     if (!token) { navigate('/partner/login'); return }
     const info = localStorage.getItem('partner_info')
     if (info) setPartner(JSON.parse(info))
   }, [token, navigate])
+
+
+   useEffect(() => {
+     axios
+       .get(`${import.meta.env.VITE_API_URL}/api/apartments/meta/locations`)
+       .then((r) => {
+         const apiLocations = r.data.data || [];
+         setLocations(
+           apiLocations.length >= 6 ? apiLocations : fallbackLocations
+         );
+       })
+       .catch(() => setLocations(fallbackLocations));
+   }, []);
+
+ 
 
   // ── Fetch sales ─────────────────────────────────────────────
   const fetchApartments = useCallback(async () => {
@@ -176,7 +217,6 @@ export default function PartnerDashboard() {
 
   return (
     <div className="dashboard">
-
       {/* ── Top Bar ── */}
       <div className="dashboard__topbar">
         <div className="dashboard__topbar-inner">
@@ -188,12 +228,22 @@ export default function PartnerDashboard() {
             </div>
           </div>
           <div className="dashboard__topbar-user">
-            <div className="dashboard__topbar-avatar">{partner?.full_name?.[0] || 'P'}</div>
-            <div className="dashboard__topbar-info">
-              <span className="dashboard__topbar-fullname">{partner?.full_name || 'Partner'}</span>
-              <span className="dashboard__topbar-email">{partner?.email || ''}</span>
+            <div className="dashboard__topbar-avatar">
+              {partner?.full_name?.[0] || 'P'}
             </div>
-            <button className="dashboard__logout-btn" onClick={handleLogout} title="Sign out">
+            <div className="dashboard__topbar-info">
+              <span className="dashboard__topbar-fullname">
+                {partner?.full_name || 'Partner'}
+              </span>
+              <span className="dashboard__topbar-email">
+                {partner?.email || ''}
+              </span>
+            </div>
+            <button
+              className="dashboard__logout-btn"
+              onClick={handleLogout}
+              title="Sign out"
+            >
               <FaSignOutAlt />
             </button>
           </div>
@@ -201,7 +251,6 @@ export default function PartnerDashboard() {
       </div>
 
       <div className="dashboard__body">
-
         {/* ── Tabs ── */}
         <div className="dashboard__tabs">
           <button
@@ -224,20 +273,42 @@ export default function PartnerDashboard() {
         {tab === 'sales' && (
           <div className="dashboard__stats">
             <div className="dashboard__stat-card">
-              <div className="dashboard__stat-icon dashboard__stat-icon--blue"><FaBuilding /></div>
-              <div><span className="dashboard__stat-value">{stats.total}</span><span className="dashboard__stat-label">Total Properties</span></div>
+              <div className="dashboard__stat-icon dashboard__stat-icon--blue">
+                <FaBuilding />
+              </div>
+              <div>
+                <span className="dashboard__stat-value">{stats.total}</span>
+                <span className="dashboard__stat-label">Total Properties</span>
+              </div>
             </div>
             <div className="dashboard__stat-card">
-              <div className="dashboard__stat-icon dashboard__stat-icon--green"><FaChartBar /></div>
-              <div><span className="dashboard__stat-value">{stats.active}</span><span className="dashboard__stat-label">Active Listings</span></div>
+              <div className="dashboard__stat-icon dashboard__stat-icon--green">
+                <FaChartBar />
+              </div>
+              <div>
+                <span className="dashboard__stat-value">{stats.active}</span>
+                <span className="dashboard__stat-label">Active Listings</span>
+              </div>
             </div>
             <div className="dashboard__stat-card">
-              <div className="dashboard__stat-icon dashboard__stat-icon--red"><FaBuilding /></div>
-              <div><span className="dashboard__stat-value">{stats.sold}</span><span className="dashboard__stat-label">Sold Properties</span></div>
+              <div className="dashboard__stat-icon dashboard__stat-icon--red">
+                <FaBuilding />
+              </div>
+              <div>
+                <span className="dashboard__stat-value">{stats.sold}</span>
+                <span className="dashboard__stat-label">Sold Properties</span>
+              </div>
             </div>
             <div className="dashboard__stat-card">
-              <div className="dashboard__stat-icon dashboard__stat-icon--gold"><FaChartBar /></div>
-              <div><span className="dashboard__stat-value">ETB {fmt(stats.avgPrice)}</span><span className="dashboard__stat-label">Average Price</span></div>
+              <div className="dashboard__stat-icon dashboard__stat-icon--gold">
+                <FaChartBar />
+              </div>
+              <div>
+                <span className="dashboard__stat-value">
+                  ETB {fmt(stats.avgPrice)}
+                </span>
+                <span className="dashboard__stat-label">Average Price</span>
+              </div>
             </div>
           </div>
         )}
@@ -245,88 +316,201 @@ export default function PartnerDashboard() {
         {/* ── Table ── */}
         {tab === 'sales' && (
           <div className="dashboard__table-card">
-          <div className="dashboard__toolbar">
-            <div className="dashboard__toolbar-left">
-              <h3 className="dashboard__table-title">
-                <FaBuilding /> Property Listings
-                <span className="dashboard__table-count">{sales.length} records</span>
-              </h3>
-            </div>
-            <div className="dashboard__toolbar-right">
-              <div className="dashboard__search-wrap">
-                <FaSearch className="dashboard__search-icon" />
-                <input type="text" className="dashboard__search" placeholder="Search properties..." value={search} onChange={e => setSearch(e.target.value)} />
-                {search && <button className="dashboard__search-clear" onClick={() => setSearch('')}><FaTimes /></button>}
+            <div className="dashboard__toolbar">
+              <div className="dashboard__toolbar-left">
+                <h3 className="dashboard__table-title">
+                  <FaBuilding /> Property Listings
+                  <span className="dashboard__table-count">
+                    {sales.length} records
+                  </span>
+                </h3>
               </div>
-              <select className="dashboard__filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="sold">Sold</option>
-                <option value="pending">Pending</option>
-                <option value="off-market">Off Market</option>
-              </select>
-              <select className="dashboard__filter-select" value={filterType} onChange={e => setFilterType(e.target.value)}>
-                <option value="">All Types</option>
-                {PROPERTY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-              {hasFilters && (
-                <button className="dashboard__clear-btn" onClick={clearFilters}><FaTimes /> Clear</button>
-              )}
-              <button className="dashboard__export-btn" onClick={exportCSV}><FaFileExcel /> Export</button>
+              <div className="dashboard__toolbar-right">
+                <div className="dashboard__search-wrap">
+                  <FaSearch className="dashboard__search-icon" />
+                  <input
+                    type="text"
+                    className="dashboard__search"
+                    placeholder="Search properties..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  {search && (
+                    <button
+                      className="dashboard__search-clear"
+                      onClick={() => setSearch('')}
+                    >
+                      <FaTimes />
+                    </button>
+                  )}
+                </div>
+                <select
+                  className="dashboard__filter-select"
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                >
+                  <option value="">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="sold">Sold</option>
+                  <option value="pending">Pending</option>
+                  <option value="off-market">Off Market</option>
+                </select>
+                <select
+                  className="dashboard__filter-select"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="">All Types</option>
+                  {PROPERTY_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                {hasFilters && (
+                  <button
+                    className="dashboard__clear-btn"
+                    onClick={clearFilters}
+                  >
+                    <FaTimes /> Clear
+                  </button>
+                )}
+                <button className="dashboard__export-btn" onClick={exportCSV}>
+                  <FaFileExcel /> Export
+                </button>
+              </div>
+            </div>
+
+            {error && <div className="dashboard__error">{error}</div>}
+
+            <div className="dashboard__table-wrap">
+              <table className="dashboard__table">
+                <thead>
+                  <tr>
+                    <th
+                      className="tbl-th tbl-th--sortable"
+                      onClick={() => handleSort('place')}
+                    >
+                      PLACE{' '}
+                      <SortIcon
+                        col="place"
+                        sortCol={sortCol}
+                        sortDir={sortDir}
+                      />
+                    </th>
+                    <th className="tbl-th">PROPERTY TYPE</th>
+                    <th className="tbl-th">LISTING STATUS</th>
+                    <th
+                      className="tbl-th tbl-th--sortable tbl-th--num"
+                      onClick={() => handleSort('price_etb')}
+                    >
+                      PRICE{' '}
+                      <SortIcon
+                        col="price_etb"
+                        sortCol={sortCol}
+                        sortDir={sortDir}
+                      />
+                    </th>
+                    <th
+                      className="tbl-th tbl-th--sortable tbl-th--num"
+                      onClick={() => handleSort('area_sqm')}
+                    >
+                      AREA (SQM){' '}
+                      <SortIcon
+                        col="area_sqm"
+                        sortCol={sortCol}
+                        sortDir={sortDir}
+                      />
+                    </th>
+                    <th
+                      className="tbl-th tbl-th--sortable tbl-th--num"
+                      onClick={() => handleSort('per_sqm_birr')}
+                    >
+                      PER SQM (BIRR){' '}
+                      <SortIcon
+                        col="per_sqm_birr"
+                        sortCol={sortCol}
+                        sortDir={sortDir}
+                      />
+                    </th>
+                    <th className="tbl-th tbl-th--num">BEDS</th>
+                    <th className="tbl-th tbl-th--num">BATHS</th>
+                    <th className="tbl-th">AGENT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={9} className="tbl-loading">
+                        <div className="tbl-spinner" /> Loading properties...
+                      </td>
+                    </tr>
+                  ) : sales.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} className="tbl-empty">
+                        <FaFilter
+                          style={{
+                            fontSize: '2rem',
+                            opacity: 0.3,
+                            marginBottom: '8px',
+                          }}
+                        />
+                        <div>No properties match your filters.</div>
+                      </td>
+                    </tr>
+                  ) : (
+                    sales.map((s, i) => {
+                      const st =
+                        STATUS_COLORS[s.listing_status] || STATUS_COLORS.active;
+                      return (
+                        <tr
+                          key={s.id}
+                          className={`tbl-row ${i % 2 === 0 ? 'tbl-row--even' : ''}`}
+                        >
+                          <td className="tbl-td tbl-td--place">{s.place}</td>
+                          <td className="tbl-td">{s.property_type}</td>
+                          <td className="tbl-td">
+                            <span
+                              className="tbl-status"
+                              style={{ background: st.bg, color: st.color }}
+                            >
+                              {st.label}
+                            </span>
+                          </td>
+                          <td className="tbl-td tbl-td--num">
+                            <span className="tbl-price">
+                              {fmt(s.price_etb)}
+                            </span>
+                            <span className="tbl-price-unit"> ETB</span>
+                          </td>
+                          <td className="tbl-td tbl-td--num">
+                            {Number(s.area_sqm).toFixed(2)}
+                          </td>
+                          <td className="tbl-td tbl-td--num tbl-td--bold">
+                            {fmt(s.per_sqm_birr)}
+                          </td>
+                          <td className="tbl-td tbl-td--num">
+                            {s.bedrooms || '—'}
+                          </td>
+                          <td className="tbl-td tbl-td--num">
+                            {s.bathrooms || '—'}
+                          </td>
+                          <td className="tbl-td tbl-td--agent">
+                            {s.agent_name || '—'}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="dashboard__table-footer">
+              Showing {sales.length} properties · Data visible to approved
+              MILEVIA partners only
             </div>
           </div>
-
-          {error && <div className="dashboard__error">{error}</div>}
-
-          <div className="dashboard__table-wrap">
-            <table className="dashboard__table">
-              <thead>
-                <tr>
-                  <th className="tbl-th tbl-th--sortable" onClick={() => handleSort('place')}>PLACE <SortIcon col="place" sortCol={sortCol} sortDir={sortDir} /></th>
-                  <th className="tbl-th">PROPERTY TYPE</th>
-                  <th className="tbl-th">LISTING STATUS</th>
-                  <th className="tbl-th tbl-th--sortable tbl-th--num" onClick={() => handleSort('price_etb')}>PRICE <SortIcon col="price_etb" sortCol={sortCol} sortDir={sortDir} /></th>
-                  <th className="tbl-th tbl-th--sortable tbl-th--num" onClick={() => handleSort('area_sqm')}>AREA (SQM) <SortIcon col="area_sqm" sortCol={sortCol} sortDir={sortDir} /></th>
-                  <th className="tbl-th tbl-th--sortable tbl-th--num" onClick={() => handleSort('per_sqm_birr')}>PER SQM (BIRR) <SortIcon col="per_sqm_birr" sortCol={sortCol} sortDir={sortDir} /></th>
-                  <th className="tbl-th tbl-th--num">BEDS</th>
-                  <th className="tbl-th tbl-th--num">BATHS</th>
-                  <th className="tbl-th">AGENT</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr><td colSpan={9} className="tbl-loading"><div className="tbl-spinner" /> Loading properties...</td></tr>
-                ) : sales.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="tbl-empty">
-                      <FaFilter style={{ fontSize: '2rem', opacity: 0.3, marginBottom: '8px' }} />
-                      <div>No properties match your filters.</div>
-                    </td>
-                  </tr>
-                ) : sales.map((s, i) => {
-                  const st = STATUS_COLORS[s.listing_status] || STATUS_COLORS.active
-                  return (
-                    <tr key={s.id} className={`tbl-row ${i % 2 === 0 ? 'tbl-row--even' : ''}`}>
-                      <td className="tbl-td tbl-td--place">{s.place}</td>
-                      <td className="tbl-td">{s.property_type}</td>
-                      <td className="tbl-td"><span className="tbl-status" style={{ background: st.bg, color: st.color }}>{st.label}</span></td>
-                      <td className="tbl-td tbl-td--num"><span className="tbl-price">{fmt(s.price_etb)}</span><span className="tbl-price-unit"> ETB</span></td>
-                      <td className="tbl-td tbl-td--num">{Number(s.area_sqm).toFixed(2)}</td>
-                      <td className="tbl-td tbl-td--num tbl-td--bold">{fmt(s.per_sqm_birr)}</td>
-                      <td className="tbl-td tbl-td--num">{s.bedrooms || '—'}</td>
-                      <td className="tbl-td tbl-td--num">{s.bathrooms || '—'}</td>
-                      <td className="tbl-td tbl-td--agent">{s.agent_name || '—'}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="dashboard__table-footer">
-            Showing {sales.length} properties · Data visible to approved MILEVIA partners only
-          </div>
-        </div>
         )}
 
         {/* ── Live Apartments Table ── */}
@@ -336,8 +520,70 @@ export default function PartnerDashboard() {
               <div className="dashboard__toolbar-left">
                 <h3 className="dashboard__table-title">
                   <FaHome /> Live Apartments
-                  <span className="dashboard__table-count">{apartments.length} listings</span>
+                  <span className="dashboard__table-count">
+                    {apartments.length} listings
+                  </span>
                 </h3>
+              </div>
+              <div className="dashboard__toolbar-right">
+                <div className="dashboard__search-wrap">
+                  <FaSearch className="dashboard__search-icon" />
+                  <input
+                    type="text"
+                    className="dashboard__search"
+                    placeholder="Search properties..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  {search && (
+                    <button
+                      className="dashboard__search-clear"
+                      onClick={() => setSearch('')}
+                    >
+                      <FaTimes />
+                    </button>
+                  )}
+                </div>
+                <select
+                  className="dashboard__filter-select"
+                  value={local.location_name}
+                  onChange={(e) =>
+                    setLocal({
+                      location_name: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">All Locations</option>
+
+                  {locations.map((loc) => (
+                    <option key={loc.id} value={loc.name}>
+                      {loc.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="dashboard__filter-select"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="">All Types</option>
+                  {PROPERTY_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                {hasFilters && (
+                  <button
+                    className="dashboard__clear-btn"
+                    onClick={clearFilters}
+                  >
+                    <FaTimes /> Clear
+                  </button>
+                )}
+                <button className="dashboard__export-btn" onClick={exportCSV}>
+                  <FaFileExcel /> Export
+                </button>
               </div>
             </div>
             <div className="dashboard__table-wrap">
@@ -357,53 +603,114 @@ export default function PartnerDashboard() {
                 </thead>
                 <tbody>
                   {aptLoading ? (
-                    <tr><td colSpan={9} className="tbl-loading"><div className="tbl-spinner" /> Loading apartments...</td></tr>
-                  ) : apartments.length === 0 ? (
-                    <tr><td colSpan={9} className="tbl-empty">No live apartments available at the moment.</td></tr>
-                  ) : apartments.map((a, i) => (
-                    <tr key={a.id} className={`tbl-row ${i % 2 === 0 ? 'tbl-row--even' : ''}`}>
-                      <td className="tbl-td tbl-td--bold">{a.title}</td>
-                      <td className="tbl-td">{a.location_name || '—'}</td>
-                      <td className="tbl-td">{a.property_type || '—'}</td>
-                      <td className="tbl-td tbl-td--num">{a.bedrooms}</td>
-                      <td className="tbl-td tbl-td--num">{a.bathrooms}</td>
-                      <td className="tbl-td tbl-td--num"><span className="tbl-price">{fmt(a.price_etb)}</span></td>
-                      <td className="tbl-td tbl-td--num">{a.size_sqm ? Number(a.size_sqm).toFixed(0) : '—'}</td>
-                      <td className="tbl-td">
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>
-                            {Array.isArray(a.images) ? a.images.length : 0} Photos
-                          </span>
-                          {getVideoLinks(a).length > 0 && (
-                            <span style={{ fontSize: '0.85rem', color: '#10B981', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <FaPlayCircle /> {getVideoLinks(a).length} Video{getVideoLinks(a).length > 1 ? 's' : ''}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="tbl-td tbl-td--links">
-                        {getVideoLinks(a).length > 0 ? (
-                          <div className="tbl-link-list">
-                            {getVideoLinks(a).map((url, idx) => (
-                              <a
-                                key={`${url}-${idx}`}
-                                href={url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="tbl-video-link"
-                                title={url}
-                              >
-                               <FaTelegramPlane className="tbl-video-link__icon" />
-                                  <span>video Link</span>
-                              </a>
-                            ))}
-                          </div>
-                        ) : (
-                          '-'
-                        )}
+                    <tr>
+                      <td colSpan={9} className="tbl-loading">
+                        <div className="tbl-spinner" /> Loading apartments...
                       </td>
                     </tr>
-                  ))}
+                  ) : apartments.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} className="tbl-empty">
+                        No live apartments available at the moment.
+                      </td>
+                    </tr>
+                  ) : (
+                    apartments
+                      .filter((a) => {
+                        const matchesSearch =
+                          !search ||
+                          a.title
+                            .toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                          (a.location_name || '')
+                            .toLowerCase()
+                            .includes(search.toLowerCase());
+
+                        const matchesType =
+                          !filterType || a.property_type === filterType;
+
+                        const matchesLocation =
+                          !local.location_name ||
+                          a.location_name === local.location_name;
+
+                        return matchesSearch && matchesType && matchesLocation;
+                      })
+                      .map((a, i) => (
+                        <tr
+                          key={a.id}
+                          className={`tbl-row ${i % 2 === 0 ? 'tbl-row--even' : ''}`}
+                        >
+                          <td className="tbl-td tbl-td--bold">{a.title}</td>
+                          <td className="tbl-td">{a.location_name || '—'}</td>
+                          <td className="tbl-td">{a.property_type || '—'}</td>
+                          <td className="tbl-td tbl-td--num">{a.bedrooms}</td>
+                          <td className="tbl-td tbl-td--num">{a.bathrooms}</td>
+                          <td className="tbl-td tbl-td--num">
+                            <span className="tbl-price">
+                              {fmt(a.price_etb)}
+                            </span>
+                          </td>
+                          <td className="tbl-td tbl-td--num">
+                            {a.size_sqm ? Number(a.size_sqm).toFixed(0) : '—'}
+                          </td>
+                          <td className="tbl-td">
+                            <div
+                              style={{
+                                display: 'flex',
+                                gap: '8px',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: '0.85rem',
+                                  color: '#6B7280',
+                                }}
+                              >
+                                {Array.isArray(a.images) ? a.images.length : 0}{' '}
+                                Photos
+                              </span>
+                              {getVideoLinks(a).length > 0 && (
+                                <span
+                                  style={{
+                                    fontSize: '0.85rem',
+                                    color: '#10B981',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                  }}
+                                >
+                                  <FaPlayCircle /> {getVideoLinks(a).length}{' '}
+                                  Video
+                                  {getVideoLinks(a).length > 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="tbl-td tbl-td--links">
+                            {getVideoLinks(a).length > 0 ? (
+                              <div className="tbl-link-list">
+                                {getVideoLinks(a).map((url, idx) => (
+                                  <a
+                                    key={`${url}-${idx}`}
+                                    href={url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="tbl-video-link"
+                                    title={url}
+                                  >
+                                    <FaTelegramPlane className="tbl-video-link__icon" />
+                                    <span>video Link</span>
+                                  </a>
+                                ))}
+                              </div>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -411,5 +718,5 @@ export default function PartnerDashboard() {
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -88,7 +88,7 @@ export default function About() {
               <p>
                 MILEVIA Estates was founded with a singular vision: to connect
                 discerning clients with the finest properties in Addis Ababa.
-                Over the past decade, we have grown to become the city's most
+                Over the past years, we have grown to become the city's most
                 trusted name in premium real estate.
               </p>
               <p style={{ marginTop: '14px' }}>
