@@ -10,12 +10,13 @@ import PartnerLogin from './pages/PartnerLogin'
 import PartnerDashboard from './pages/PartnerDashboard'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
-
+import ScrollToTop from './components/ScrollToTop';
 function App() {
   return (
     <div className="app">
       <Navbar />
       <main>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/apartments" element={<Apartments />} />
@@ -30,7 +31,7 @@ function App() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }
 
 export default App

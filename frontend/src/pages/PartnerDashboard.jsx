@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -14,7 +15,19 @@ import {
   FaFilter,
   FaHome,
   FaPlayCircle,
-  FaTelegramPlane
+  FaTelegramPlane,
+  FaUser,
+  FaEdit,
+  FaLock,
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaPhone,
+  FaEnvelope,
+  FaBriefcase,
+  FaMapMarkerAlt,
+  FaEye,
+  FaEyeSlash,
+  FaBell,
 } from 'react-icons/fa';
 import Logo from '../components/Logo'
 import './Dashboard.css'
@@ -86,6 +99,7 @@ const fallbackLocations = [
   { id: 19, name: 'Hilton Area' },
   { id: 20, name: 'Summit' },
 ];
+
 export default function PartnerDashboard() {
   const navigate = useNavigate()
   const [partner, setPartner]   = useState(null)
@@ -104,32 +118,162 @@ export default function PartnerDashboard() {
     location_id: '',
     location_name: '',
   });
-    const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const token = localStorage.getItem('partner_token')
   const [locations, setLocations] = useState(fallbackLocations);
-  // ── Auth guard ──────────────────────────────────────────────
+
+  // ── Profile Dropdown State ──
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  
+  // ── Profile state ──
+  const [profileData, setProfileData]       = useState(null)
+  const [profileLoading, setProfileLoading] = useState(false)
+  
+  // ── Edit Profile Form ──
+  const [editForm, setEditForm] = useState({
+    full_name: '', phone: '', additional_phone: '',
+    telegram_username: '', address: '', company: '', about: '',
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editMessage, setEditMessage] = useState({ type: '', text: '' });
+
+  // ── Password Change ──
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: '',
+  });
+  const [showPassword, setShowPassword] = useState({ current: false, new: false, confirm: false });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
+
+  // ── Auth guard ──
   useEffect(() => {
     if (!token) { navigate('/partner/login'); return }
     const info = localStorage.getItem('partner_info')
     if (info) setPartner(JSON.parse(info))
   }, [token, navigate])
 
+  // ── Close dropdown when clicking outside ──
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (showProfileDropdown && !event.target.closest('.dashboard__profile-dropdown')) {
+        setShowProfileDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showProfileDropdown]);
 
-   useEffect(() => {
-     axios
-       .get(`${import.meta.env.VITE_API_URL}/api/apartments/meta/locations`)
-       .then((r) => {
-         const apiLocations = r.data.data || [];
-         setLocations(
-           apiLocations.length >= 6 ? apiLocations : fallbackLocations
-         );
-       })
-       .catch(() => setLocations(fallbackLocations));
-   }, []);
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/api/apartments/meta/locations`)
+      .then((r) => {
+        const apiLocations = r.data.data || [];
+        setLocations(
+          apiLocations.length >= 6 ? apiLocations : fallbackLocations
+        );
+      })
+      .catch(() => setLocations(fallbackLocations));
+  }, []);
 
- 
+  const fetchProfile = useCallback(async () => {
+    if (!token) return;
+    setProfileLoading(true);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/partners/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setProfileData(res.data.data);
+      setEditForm({
+        full_name: res.data.data.full_name || '',
+        phone: res.data.data.phone || '',
+        additional_phone: res.data.data.additional_phone || '',
+        telegram_username: res.data.data.telegram_username || '',
+        address: res.data.data.address || '',
+        company: res.data.data.company || '',
+        about: res.data.data.about || '',
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setProfileLoading(false);
+    }
+  }, [token]);
 
-  // ── Fetch sales ─────────────────────────────────────────────
+  // ── Save Profile ──
+  const saveProfileChanges = async () => {
+    if (!editForm.full_name || !editForm.phone) {
+      setEditMessage({ type: 'error', text: 'Full name and phone are required.' });
+      return;
+    }
+    
+    setEditSaving(true);
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/partners/me`,
+        editForm,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setEditMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setIsEditing(false);
+      setShowEditProfile(false);
+      fetchProfile();
+      setTimeout(() => setEditMessage({ type: '', text: '' }), 3000);
+    } catch (err) {
+      setEditMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
+  // ── Change Password ──
+  const handlePasswordChange = async () => {
+    if (!passwordForm.current_password || !passwordForm.new_password || !passwordForm.confirm_password) {
+      setPasswordMessage({ type: 'error', text: 'All password fields are required.' });
+      return;
+    }
+    if (passwordForm.new_password.length < 6) {
+      setPasswordMessage({ type: 'error', text: 'New password must be at least 6 characters.' });
+      return;
+    }
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      setPasswordMessage({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/partners/me/password`,
+        passwordForm,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
+      setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
+      setTimeout(() => {
+        setPasswordMessage({ type: '', text: '' });
+        setShowPasswordModal(false);
+      }, 2000);
+    } catch (err) {
+      setPasswordMessage({ type: 'error', text: err.response?.data?.message || 'Failed to change password.' });
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  // ── Fetch sales ──
   const fetchApartments = useCallback(async () => {
     setAptLoading(true)
     try {
@@ -173,7 +317,11 @@ export default function PartnerDashboard() {
     }
   }, [token, search, filterStatus, filterType, sortCol, sortDir, navigate])
 
-  useEffect(() => { fetchSales(); fetchApartments(); }, [fetchSales, fetchApartments])
+  useEffect(() => {
+    fetchSales();
+    fetchApartments();
+    fetchProfile();
+  }, [fetchSales, fetchApartments, fetchProfile]);
 
   const handleSort = col => {
     if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -227,28 +375,320 @@ export default function PartnerDashboard() {
               <span className="dashboard__topbar-role">Partner Dashboard</span>
             </div>
           </div>
-          <div className="dashboard__topbar-user">
-            <div className="dashboard__topbar-avatar">
-              {partner?.full_name?.[0] || 'P'}
+          
+          <div className="dashboard__topbar-right">
+            {/* Profile Dropdown */}
+            <div className="dashboard__profile-dropdown">
+              <button 
+                className="dashboard__profile-trigger"
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              >
+                <div className="dashboard__profile-avatar-small">
+                  {profileData?.full_name?.[0] || 'P'}
+                </div>
+                <div className="dashboard__profile-info">
+                  <span className="dashboard__profile-name">
+                    {profileData?.full_name || 'Partner'}
+                  </span>
+                  <span className="dashboard__profile-email">
+                    {profileData?.email || ''}
+                  </span>
+                </div>
+                <svg className="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12">
+                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {showProfileDropdown && (
+                <div className="dashboard__profile-menu">
+                  <div className="profile-menu-header">
+                    <div className="profile-menu-avatar">
+                      {profileData?.full_name?.[0] || 'P'}
+                    </div>
+                    <div className="profile-menu-user">
+                      <strong>{profileData?.full_name || 'Partner'}</strong>
+                      <span>{profileData?.email || ''}</span>
+                    </div>
+                  </div>
+
+                  <div className="profile-menu-divider"></div>
+
+                  <div className="profile-menu-info">
+                    <div className="profile-menu-item">
+                      <FaPhone />
+                      <span>{profileData?.phone || 'No phone'}</span>
+                    </div>
+                    <div className="profile-menu-item">
+                      <FaBriefcase />
+                      <span>{profileData?.company || 'No company'}</span>
+                    </div>
+                    {profileData?.telegram_username && (
+                      <div className="profile-menu-item">
+                        <FaTelegramPlane />
+                        <span>@{profileData.telegram_username}</span>
+                      </div>
+                    )}
+                    {profileData?.address && (
+                      <div className="profile-menu-item">
+                        <FaMapMarkerAlt />
+                        <span>{profileData.address}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="profile-menu-divider"></div>
+
+                  <button 
+                    className="profile-menu-action"
+                    onClick={() => {
+                      setShowEditProfile(true);
+                      setShowProfileDropdown(false);
+                      setIsEditing(true);
+                      setEditMessage({ type: '', text: '' });
+                    }}
+                  >
+                    <FaEdit />
+                    Edit Profile
+                  </button>
+
+                  <button 
+                    className="profile-menu-action"
+                    onClick={() => {
+                      setShowPasswordModal(true);
+                      setShowProfileDropdown(false);
+                      setPasswordMessage({ type: '', text: '' });
+                      setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
+                    }}
+                  >
+                    <FaLock />
+                    Change Password
+                  </button>
+
+                  <div className="profile-menu-divider"></div>
+
+                  <button 
+                    className="profile-menu-action profile-menu-action--danger"
+                    onClick={handleLogout}
+                  >
+                    <FaSignOutAlt />
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="dashboard__topbar-info">
-              <span className="dashboard__topbar-fullname">
-                {partner?.full_name || 'Partner'}
-              </span>
-              <span className="dashboard__topbar-email">
-                {partner?.email || ''}
-              </span>
-            </div>
-            <button
-              className="dashboard__logout-btn"
-              onClick={handleLogout}
-              title="Sign out"
-            >
-              <FaSignOutAlt />
-            </button>
           </div>
         </div>
       </div>
+
+      {/* ── Edit Profile Modal ── */}
+      {showEditProfile && (
+        <div className="modal-overlay" onClick={() => {
+          setShowEditProfile(false);
+          setIsEditing(false);
+          setEditMessage({ type: '', text: '' });
+        }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3><FaEdit /> Edit Profile</h3>
+              <button className="modal-close" onClick={() => {
+                setShowEditProfile(false);
+                setIsEditing(false);
+                setEditMessage({ type: '', text: '' });
+              }}>×</button>
+            </div>
+            <div className="modal-body">
+              {editMessage.text && (
+                <div className={`modal-message modal-message--${editMessage.type}`}>
+                  {editMessage.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                  {editMessage.text}
+                </div>
+              )}
+              
+              <div className="edit-form">
+                <div className="edit-form-group">
+                  <label><FaUser /> Full Name *</label>
+                  <input
+                    type="text"
+                    value={editForm.full_name}
+                    onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
+                    placeholder="Full Name"
+                  />
+                </div>
+
+                <div className="edit-form-group">
+                  <label><FaPhone /> Phone *</label>
+                  <input
+                    type="text"
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    placeholder="Phone"
+                  />
+                </div>
+
+                <div className="edit-form-group">
+                  <label><FaPhone /> Additional Phone</label>
+                  <input
+                    type="text"
+                    value={editForm.additional_phone}
+                    onChange={(e) => setEditForm({ ...editForm, additional_phone: e.target.value })}
+                    placeholder="Additional Phone"
+                  />
+                </div>
+
+                <div className="edit-form-group">
+                  <label><FaTelegramPlane /> Telegram Username</label>
+                  <input
+                    type="text"
+                    value={editForm.telegram_username}
+                    onChange={(e) => setEditForm({ ...editForm, telegram_username: e.target.value })}
+                    placeholder="Telegram Username"
+                  />
+                </div>
+
+                <div className="edit-form-group">
+                  <label><FaBriefcase /> Company</label>
+                  <input
+                    type="text"
+                    value={editForm.company}
+                    onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
+                    placeholder="Company"
+                  />
+                </div>
+
+                <div className="edit-form-group">
+                  <label><FaMapMarkerAlt /> Address</label>
+                  <input
+                    type="text"
+                    value={editForm.address}
+                    onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                    placeholder="Address"
+                  />
+                </div>
+
+                <div className="edit-form-group full-width">
+                  <label><FaUser /> About</label>
+                  <textarea
+                    value={editForm.about}
+                    onChange={(e) => setEditForm({ ...editForm, about: e.target.value })}
+                    placeholder="Tell us about yourself..."
+                    rows="4"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => {
+                setShowEditProfile(false);
+                setIsEditing(false);
+                setEditMessage({ type: '', text: '' });
+              }}>
+                Cancel
+              </button>
+              <button className="btn btn-primary" onClick={saveProfileChanges} disabled={editSaving}>
+                {editSaving ? 'Saving...' : <><FaCheckCircle /> Save Changes</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Change Password Modal ── */}
+      {showPasswordModal && (
+        <div className="modal-overlay" onClick={() => {
+          setShowPasswordModal(false);
+          setPasswordMessage({ type: '', text: '' });
+        }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3><FaLock /> Change Password</h3>
+              <button className="modal-close" onClick={() => {
+                setShowPasswordModal(false);
+                setPasswordMessage({ type: '', text: '' });
+              }}>×</button>
+            </div>
+            <div className="modal-body">
+              {passwordMessage.text && (
+                <div className={`modal-message modal-message--${passwordMessage.type}`}>
+                  {passwordMessage.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                  {passwordMessage.text}
+                </div>
+              )}
+              
+              <div className="edit-form">
+                <div className="edit-form-group full-width">
+                  <label>Current Password</label>
+                  <div className="password-input-group">
+                    <input
+                      type={showPassword.current ? 'text' : 'password'}
+                      value={passwordForm.current_password}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
+                      placeholder="Enter current password"
+                    />
+                    <button 
+                      className="password-toggle-btn"
+                      onClick={() => setShowPassword({ ...showPassword, current: !showPassword.current })}
+                    >
+                      {showPassword.current ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="edit-form-group full-width">
+                  <label>New Password</label>
+                  <div className="password-input-group">
+                    <input
+                      type={showPassword.new ? 'text' : 'password'}
+                      value={passwordForm.new_password}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
+                      placeholder="New password (min 6 characters)"
+                    />
+                    <button 
+                      className="password-toggle-btn"
+                      onClick={() => setShowPassword({ ...showPassword, new: !showPassword.new })}
+                    >
+                      {showPassword.new ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="edit-form-group full-width">
+                  <label>Confirm Password</label>
+                  <div className="password-input-group">
+                    <input
+                      type={showPassword.confirm ? 'text' : 'password'}
+                      value={passwordForm.confirm_password}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
+                      placeholder="Confirm new password"
+                    />
+                    <button 
+                      className="password-toggle-btn"
+                      onClick={() => setShowPassword({ ...showPassword, confirm: !showPassword.confirm })}
+                    >
+                      {showPassword.confirm ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => {
+                setShowPasswordModal(false);
+                setPasswordMessage({ type: '', text: '' });
+              }}>
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={handlePasswordChange}
+                disabled={passwordLoading}
+              >
+                {passwordLoading ? 'Updating...' : 'Update Password'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="dashboard__body">
         {/* ── Tabs ── */}
@@ -554,7 +994,6 @@ export default function PartnerDashboard() {
                   }
                 >
                   <option value="">All Locations</option>
-
                   {locations.map((loc) => (
                     <option key={loc.id} value={loc.name}>
                       {loc.name}
