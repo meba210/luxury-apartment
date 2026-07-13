@@ -112,6 +112,7 @@ export default function PartnerDashboard() {
   const [search, setSearch]     = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [filterType, setFilterType]     = useState('')
+  const [filterBedrooms, setFilterBedrooms] = useState('');
   const [sortCol, setSortCol]   = useState('created_at')
   const [sortDir, setSortDir]   = useState('desc')
   const [local, setLocal] = useState({
@@ -328,7 +329,15 @@ export default function PartnerDashboard() {
     else { setSortCol(col); setSortDir('asc') }
   }
 
-  const clearFilters = () => { setSearch(''); setFilterStatus(''); setFilterType('') }
+ const clearFilters = () => {
+   setSearch('');
+   setFilterStatus('');
+   setFilterType('');
+   setFilterBedrooms('');
+   setLocal({
+     location_name: '',
+   });
+ };
   const hasFilters = search || filterStatus || filterType
 
   const exportCSV = () => {
@@ -375,11 +384,11 @@ export default function PartnerDashboard() {
               <span className="dashboard__topbar-role">Partner Dashboard</span>
             </div>
           </div>
-          
+
           <div className="dashboard__topbar-right">
             {/* Profile Dropdown */}
             <div className="dashboard__profile-dropdown">
-              <button 
+              <button
                 className="dashboard__profile-trigger"
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
               >
@@ -394,8 +403,19 @@ export default function PartnerDashboard() {
                     {profileData?.email || ''}
                   </span>
                 </div>
-                <svg className="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12">
-                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                <svg
+                  className="dropdown-arrow"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                >
+                  <path
+                    d="M2 4l4 4 4-4"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </button>
 
@@ -439,7 +459,7 @@ export default function PartnerDashboard() {
 
                   <div className="profile-menu-divider"></div>
 
-                  <button 
+                  <button
                     className="profile-menu-action"
                     onClick={() => {
                       setShowEditProfile(true);
@@ -452,13 +472,17 @@ export default function PartnerDashboard() {
                     Edit Profile
                   </button>
 
-                  <button 
+                  <button
                     className="profile-menu-action"
                     onClick={() => {
                       setShowPasswordModal(true);
                       setShowProfileDropdown(false);
                       setPasswordMessage({ type: '', text: '' });
-                      setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
+                      setPasswordForm({
+                        current_password: '',
+                        new_password: '',
+                        confirm_password: '',
+                      });
                     }}
                   >
                     <FaLock />
@@ -467,7 +491,7 @@ export default function PartnerDashboard() {
 
                   <div className="profile-menu-divider"></div>
 
-                  <button 
+                  <button
                     className="profile-menu-action profile-menu-action--danger"
                     onClick={handleLogout}
                   >
@@ -483,94 +507,144 @@ export default function PartnerDashboard() {
 
       {/* ── Edit Profile Modal ── */}
       {showEditProfile && (
-        <div className="modal-overlay" onClick={() => {
-          setShowEditProfile(false);
-          setIsEditing(false);
-          setEditMessage({ type: '', text: '' });
-        }}>
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            setShowEditProfile(false);
+            setIsEditing(false);
+            setEditMessage({ type: '', text: '' });
+          }}
+        >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3><FaEdit /> Edit Profile</h3>
-              <button className="modal-close" onClick={() => {
-                setShowEditProfile(false);
-                setIsEditing(false);
-                setEditMessage({ type: '', text: '' });
-              }}>×</button>
+              <h3>
+                <FaEdit /> Edit Profile
+              </h3>
+              <button
+                className="modal-close"
+                onClick={() => {
+                  setShowEditProfile(false);
+                  setIsEditing(false);
+                  setEditMessage({ type: '', text: '' });
+                }}
+              >
+                ×
+              </button>
             </div>
             <div className="modal-body">
               {editMessage.text && (
-                <div className={`modal-message modal-message--${editMessage.type}`}>
-                  {editMessage.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                <div
+                  className={`modal-message modal-message--${editMessage.type}`}
+                >
+                  {editMessage.type === 'success' ? (
+                    <FaCheckCircle />
+                  ) : (
+                    <FaExclamationCircle />
+                  )}
                   {editMessage.text}
                 </div>
               )}
-              
+
               <div className="edit-form">
                 <div className="edit-form-group">
-                  <label><FaUser /> Full Name *</label>
+                  <label>
+                    <FaUser /> Full Name *
+                  </label>
                   <input
                     type="text"
                     value={editForm.full_name}
-                    onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, full_name: e.target.value })
+                    }
                     placeholder="Full Name"
                   />
                 </div>
 
                 <div className="edit-form-group">
-                  <label><FaPhone /> Phone *</label>
+                  <label>
+                    <FaPhone /> Phone *
+                  </label>
                   <input
                     type="text"
                     value={editForm.phone}
-                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, phone: e.target.value })
+                    }
                     placeholder="Phone"
                   />
                 </div>
 
                 <div className="edit-form-group">
-                  <label><FaPhone /> Additional Phone</label>
+                  <label>
+                    <FaPhone /> Additional Phone
+                  </label>
                   <input
                     type="text"
                     value={editForm.additional_phone}
-                    onChange={(e) => setEditForm({ ...editForm, additional_phone: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        additional_phone: e.target.value,
+                      })
+                    }
                     placeholder="Additional Phone"
                   />
                 </div>
 
                 <div className="edit-form-group">
-                  <label><FaTelegramPlane /> Telegram Username</label>
+                  <label>
+                    <FaTelegramPlane /> Telegram Username
+                  </label>
                   <input
                     type="text"
                     value={editForm.telegram_username}
-                    onChange={(e) => setEditForm({ ...editForm, telegram_username: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        telegram_username: e.target.value,
+                      })
+                    }
                     placeholder="Telegram Username"
                   />
                 </div>
 
                 <div className="edit-form-group">
-                  <label><FaBriefcase /> Company</label>
+                  <label>
+                    <FaBriefcase /> Company
+                  </label>
                   <input
                     type="text"
                     value={editForm.company}
-                    onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, company: e.target.value })
+                    }
                     placeholder="Company"
                   />
                 </div>
 
                 <div className="edit-form-group">
-                  <label><FaMapMarkerAlt /> Address</label>
+                  <label>
+                    <FaMapMarkerAlt /> Address
+                  </label>
                   <input
                     type="text"
                     value={editForm.address}
-                    onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, address: e.target.value })
+                    }
                     placeholder="Address"
                   />
                 </div>
 
                 <div className="edit-form-group full-width">
-                  <label><FaUser /> About</label>
+                  <label>
+                    <FaUser /> About
+                  </label>
                   <textarea
                     value={editForm.about}
-                    onChange={(e) => setEditForm({ ...editForm, about: e.target.value })}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, about: e.target.value })
+                    }
                     placeholder="Tell us about yourself..."
                     rows="4"
                   />
@@ -578,15 +652,28 @@ export default function PartnerDashboard() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => {
-                setShowEditProfile(false);
-                setIsEditing(false);
-                setEditMessage({ type: '', text: '' });
-              }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setShowEditProfile(false);
+                  setIsEditing(false);
+                  setEditMessage({ type: '', text: '' });
+                }}
+              >
                 Cancel
               </button>
-              <button className="btn btn-primary" onClick={saveProfileChanges} disabled={editSaving}>
-                {editSaving ? 'Saving...' : <><FaCheckCircle /> Save Changes</>}
+              <button
+                className="btn btn-primary"
+                onClick={saveProfileChanges}
+                disabled={editSaving}
+              >
+                {editSaving ? (
+                  'Saving...'
+                ) : (
+                  <>
+                    <FaCheckCircle /> Save Changes
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -595,26 +682,42 @@ export default function PartnerDashboard() {
 
       {/* ── Change Password Modal ── */}
       {showPasswordModal && (
-        <div className="modal-overlay" onClick={() => {
-          setShowPasswordModal(false);
-          setPasswordMessage({ type: '', text: '' });
-        }}>
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            setShowPasswordModal(false);
+            setPasswordMessage({ type: '', text: '' });
+          }}
+        >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3><FaLock /> Change Password</h3>
-              <button className="modal-close" onClick={() => {
-                setShowPasswordModal(false);
-                setPasswordMessage({ type: '', text: '' });
-              }}>×</button>
+              <h3>
+                <FaLock /> Change Password
+              </h3>
+              <button
+                className="modal-close"
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setPasswordMessage({ type: '', text: '' });
+                }}
+              >
+                ×
+              </button>
             </div>
             <div className="modal-body">
               {passwordMessage.text && (
-                <div className={`modal-message modal-message--${passwordMessage.type}`}>
-                  {passwordMessage.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+                <div
+                  className={`modal-message modal-message--${passwordMessage.type}`}
+                >
+                  {passwordMessage.type === 'success' ? (
+                    <FaCheckCircle />
+                  ) : (
+                    <FaExclamationCircle />
+                  )}
                   {passwordMessage.text}
                 </div>
               )}
-              
+
               <div className="edit-form">
                 <div className="edit-form-group full-width">
                   <label>Current Password</label>
@@ -622,12 +725,22 @@ export default function PartnerDashboard() {
                     <input
                       type={showPassword.current ? 'text' : 'password'}
                       value={passwordForm.current_password}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
+                      onChange={(e) =>
+                        setPasswordForm({
+                          ...passwordForm,
+                          current_password: e.target.value,
+                        })
+                      }
                       placeholder="Enter current password"
                     />
-                    <button 
+                    <button
                       className="password-toggle-btn"
-                      onClick={() => setShowPassword({ ...showPassword, current: !showPassword.current })}
+                      onClick={() =>
+                        setShowPassword({
+                          ...showPassword,
+                          current: !showPassword.current,
+                        })
+                      }
                     >
                       {showPassword.current ? <FaEyeSlash /> : <FaEye />}
                     </button>
@@ -640,12 +753,22 @@ export default function PartnerDashboard() {
                     <input
                       type={showPassword.new ? 'text' : 'password'}
                       value={passwordForm.new_password}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
+                      onChange={(e) =>
+                        setPasswordForm({
+                          ...passwordForm,
+                          new_password: e.target.value,
+                        })
+                      }
                       placeholder="New password (min 6 characters)"
                     />
-                    <button 
+                    <button
                       className="password-toggle-btn"
-                      onClick={() => setShowPassword({ ...showPassword, new: !showPassword.new })}
+                      onClick={() =>
+                        setShowPassword({
+                          ...showPassword,
+                          new: !showPassword.new,
+                        })
+                      }
                     >
                       {showPassword.new ? <FaEyeSlash /> : <FaEye />}
                     </button>
@@ -658,12 +781,22 @@ export default function PartnerDashboard() {
                     <input
                       type={showPassword.confirm ? 'text' : 'password'}
                       value={passwordForm.confirm_password}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
+                      onChange={(e) =>
+                        setPasswordForm({
+                          ...passwordForm,
+                          confirm_password: e.target.value,
+                        })
+                      }
                       placeholder="Confirm new password"
                     />
-                    <button 
+                    <button
                       className="password-toggle-btn"
-                      onClick={() => setShowPassword({ ...showPassword, confirm: !showPassword.confirm })}
+                      onClick={() =>
+                        setShowPassword({
+                          ...showPassword,
+                          confirm: !showPassword.confirm,
+                        })
+                      }
                     >
                       {showPassword.confirm ? <FaEyeSlash /> : <FaEye />}
                     </button>
@@ -672,14 +805,17 @@ export default function PartnerDashboard() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => {
-                setShowPasswordModal(false);
-                setPasswordMessage({ type: '', text: '' });
-              }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setPasswordMessage({ type: '', text: '' });
+                }}
+              >
                 Cancel
               </button>
-              <button 
-                className="btn btn-primary" 
+              <button
+                className="btn btn-primary"
                 onClick={handlePasswordChange}
                 disabled={passwordLoading}
               >
@@ -1002,6 +1138,18 @@ export default function PartnerDashboard() {
                 </select>
                 <select
                   className="dashboard__filter-select"
+                  value={filterBedrooms}
+                  onChange={(e) => setFilterBedrooms(e.target.value)}
+                >
+                  <option value="">All Bedrooms</option>
+                  <option value="1">1 Bedroom</option>
+                  <option value="2">2 Bedrooms</option>
+                  <option value="3">3 Bedrooms</option>
+                  <option value="4">4 Bedrooms</option>
+                  <option value="5">5+ Bedrooms</option>
+                </select>
+                <select
+                  className="dashboard__filter-select"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
                 >
@@ -1072,7 +1220,18 @@ export default function PartnerDashboard() {
                           !local.location_name ||
                           a.location_name === local.location_name;
 
-                        return matchesSearch && matchesType && matchesLocation;
+                        const matchesBedrooms =
+                          !filterBedrooms ||
+                          (filterBedrooms === '5'
+                            ? Number(a.bedrooms) >= 5
+                            : Number(a.bedrooms) === Number(filterBedrooms));
+
+                        return (
+                          matchesSearch &&
+                          matchesType &&
+                          matchesLocation &&
+                          matchesBedrooms
+                        );
                       })
                       .map((a, i) => (
                         <tr
