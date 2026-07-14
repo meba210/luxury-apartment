@@ -37,6 +37,8 @@ const STATUS_COLORS = {
   'off-market': { bg: '#F3F4F6', color: '#374151' },
 };
 
+const PROPERTY_TYPES = ['Apartment', 'Duplex', 'Penthouse'];
+
 const PARTNER_STATUS = {
   pending: { bg: '#FEF3C7', color: '#92400E', label: 'Pending' },
   approved: { bg: '#E6F9EE', color: '#1A7A3C', label: 'Approved' },
@@ -152,6 +154,13 @@ const BLANK_SALE = {
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
+    const [search, setSearch]     = useState('')
+   const [local, setLocal] = useState({
+     location_id: '',
+     location_name: '',
+   });
+    const [filterType, setFilterType]     = useState('')
+    const [filterBedrooms, setFilterBedrooms] = useState('');
   const token = localStorage.getItem('admin_token');
   const authH = useMemo(
     () => ({ headers: { Authorization: `Bearer ${token}` } }),
@@ -177,7 +186,7 @@ export default function AdminDashboard() {
   const [inquiryUpdatingId, setInquiryUpdatingId] = useState(null);
 
   // partner tab
-  const [search, setSearch] = useState('');
+ 
   const [filterStatus, setFilterStatus] = useState('');
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
@@ -199,6 +208,18 @@ export default function AdminDashboard() {
   const [aptVideoInput, setAptVideoInput] = useState('');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
 
+
+   const clearFilters = () => {
+     setSearch('');
+     setFilterStatus('');
+     setFilterType('');
+     setFilterBedrooms('');
+     setLocal({
+       location_name: '',
+     });
+   };
+
+    const hasFilters = search || filterStatus || filterType;
   // ── fetch ─────────────────────────────────────────────────
   const fetchAll = useCallback(async () => {
     if (!token) return;
@@ -703,6 +724,77 @@ export default function AdminDashboard() {
                 <FaHome /> Live Apartment Listings
               </h3>
               <div className="dashboard__toolbar-right">
+                <div className="dashboard__search-wrap">
+                  <FaSearch className="dashboard__search-icon" />
+                  <input
+                    type="text"
+                    className="dashboard__search"
+                    placeholder="Search properties..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  {search && (
+                    <button
+                      className="dashboard__search-clear"
+                      onClick={() => setSearch('')}
+                    >
+                      <FaTimes />
+                    </button>
+                  )}
+                </div>
+                <select
+                  className="dashboard__filter-select"
+                  value={local.location_name}
+                  onChange={(e) =>
+                    setLocal({
+                      location_name: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">All Locations</option>
+                  {locations.map((loc) => (
+                    <option key={loc.id} value={loc.name}>
+                      {loc.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="dashboard__filter-select"
+                  value={filterBedrooms}
+                  onChange={(e) => setFilterBedrooms(e.target.value)}
+                >
+                  <option value="">All Bedrooms</option>
+                  <option value="1">1 Bedroom</option>
+                  <option value="2">2 Bedrooms</option>
+                  <option value="3">3 Bedrooms</option>
+                  <option value="4">4 Bedrooms</option>
+                  <option value="5">5+ Bedrooms</option>
+                </select>
+                <select
+                  className="dashboard__filter-select"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="">All Types</option>
+                  {PROPERTY_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                {hasFilters && (
+                  <button
+                    className="dashboard__clear-btn"
+                    onClick={clearFilters}
+                  >
+                    <FaTimes /> Clear
+                  </button>
+                )}
+                <button className="dashboard__export-btn" onClick={exportCSV}>
+                  <FaFileExcel /> Export
+                </button>
+              </div>
+              <div className="dashboard__toolbar-right">
                 <button
                   className="dashboard__add-btn"
                   onClick={() => setTab('post')}
@@ -741,102 +833,139 @@ export default function AdminDashboard() {
                       </td>
                     </tr>
                   ) : (
-                    apartments.map((a, i) => (
-                      <tr
-                        key={a.id}
-                        className={`tbl-row ${i % 2 === 0 ? 'tbl-row--even' : ''}`}
-                      >
-                        <td className="tbl-td tbl-td--bold">{a.title}</td>
-                        <td className="tbl-td">{a.location_name || '—'}</td>
-                        <td className="tbl-td tbl-td--num">{a.bedrooms}</td>
-                        <td className="tbl-td tbl-td--num">
-                          <span className="tbl-price">{fmt(a.price_etb)}</span>
-                        </td>
-                        <td className="tbl-td tbl-td--num">
-                          {a.size_sqm ? Number(a.size_sqm).toFixed(0) : '—'}
-                        </td>
-                        <td className="tbl-td tbl-td--links">
-                          {getVideoLinks(a).length > 0 ? (
-                            <div className="tbl-link-list">
-                              {getVideoLinks(a).map((url, idx) => (
-                                <a
-                                  key={`${url}-${idx}`}
-                                  href={url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="tbl-video-link"
-                                  title={url}
-                                >
-                                  {/* <FaPlayCircle /> */}
-                                  <FaTelegramPlane className="tbl-video-link__icon" />
-                                  <span>video Link</span>
-                                </a>
-                              ))}
+                    apartments
+                      .filter((a) => {
+                        const matchesSearch =
+                          !search ||
+                          a.title
+                            .toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                          (a.location_name || '')
+                            .toLowerCase()
+                            .includes(search.toLowerCase());
+
+                        const matchesType =
+                          !filterType || a.property_type === filterType;
+
+                        const matchesLocation =
+                          !local.location_name ||
+                          a.location_name === local.location_name;
+
+                        const matchesBedrooms =
+                          !filterBedrooms ||
+                          (filterBedrooms === '5'
+                            ? Number(a.bedrooms) >= 5
+                            : Number(a.bedrooms) === Number(filterBedrooms));
+
+                        return (
+                          matchesSearch &&
+                          matchesType &&
+                          matchesLocation &&
+                          matchesBedrooms
+                        );
+                      })
+                      .map((a, i) => (
+                        <tr
+                          key={a.id}
+                          className={`tbl-row ${i % 2 === 0 ? 'tbl-row--even' : ''}`}
+                        >
+                          <td className="tbl-td tbl-td--bold">{a.title}</td>
+                          <td className="tbl-td">{a.location_name || '—'}</td>
+                          <td className="tbl-td tbl-td--num">{a.bedrooms}</td>
+                          <td className="tbl-td tbl-td--num">
+                            <span className="tbl-price">
+                              {fmt(a.price_etb)}
+                            </span>
+                          </td>
+                          <td className="tbl-td tbl-td--num">
+                            {a.size_sqm ? Number(a.size_sqm).toFixed(0) : '—'}
+                          </td>
+                          <td className="tbl-td tbl-td--links">
+                            {getVideoLinks(a).length > 0 ? (
+                              <div className="tbl-link-list">
+                                {getVideoLinks(a).map((url, idx) => (
+                                  <a
+                                    key={`${url}-${idx}`}
+                                    href={url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="tbl-video-link"
+                                    title={url}
+                                  >
+                                    {/* <FaPlayCircle /> */}
+                                    <FaTelegramPlane className="tbl-video-link__icon" />
+                                    <span>video Link</span>
+                                  </a>
+                                ))}
+                              </div>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+                          <td className="tbl-td">
+                            <button
+                              className={`tbl-toggle-btn ${a.is_featured ? 'tbl-toggle-btn--on' : ''}`}
+                              onClick={() =>
+                                handleToggleApt(
+                                  a.id,
+                                  'is_featured',
+                                  a.is_featured
+                                )
+                              }
+                              title="Toggle featured"
+                            >
+                              {a.is_featured ? <FaToggleOn /> : <FaToggleOff />}
+                              {a.is_featured ? ' Yes' : ' No'}
+                            </button>
+                          </td>
+                          <td className="tbl-td">
+                            <button
+                              className={`tbl-toggle-btn ${a.is_available ? 'tbl-toggle-btn--on' : 'tbl-toggle-btn--off'}`}
+                              onClick={() =>
+                                handleToggleApt(
+                                  a.id,
+                                  'is_available',
+                                  a.is_available
+                                )
+                              }
+                              title="Toggle availability"
+                            >
+                              {a.is_available ? (
+                                <FaToggleOn />
+                              ) : (
+                                <FaToggleOff />
+                              )}
+                              {a.is_available ? ' Live' : ' Hidden'}
+                            </button>
+                          </td>
+                          <td className="tbl-td">
+                            <div
+                              className="tbl-actions"
+                              style={{ display: 'flex', gap: '8px' }}
+                            >
+                              <button
+                                className="tbl-action-btn tbl-action-btn--edit"
+                                style={{
+                                  color: '#C9A84C',
+                                  background: 'rgba(201,168,76,0.1)',
+                                  padding: '6px',
+                                }}
+                                onClick={() => handleEditApt(a)}
+                                title="Edit"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                className="tbl-action-btn tbl-action-btn--delete"
+                                onClick={() => handleDeleteApt(a.id)}
+                                title="Delete"
+                              >
+                                <FaTrash />
+                              </button>
                             </div>
-                          ) : (
-                            '-'
-                          )}
-                        </td>
-                        <td className="tbl-td">
-                          <button
-                            className={`tbl-toggle-btn ${a.is_featured ? 'tbl-toggle-btn--on' : ''}`}
-                            onClick={() =>
-                              handleToggleApt(
-                                a.id,
-                                'is_featured',
-                                a.is_featured
-                              )
-                            }
-                            title="Toggle featured"
-                          >
-                            {a.is_featured ? <FaToggleOn /> : <FaToggleOff />}
-                            {a.is_featured ? ' Yes' : ' No'}
-                          </button>
-                        </td>
-                        <td className="tbl-td">
-                          <button
-                            className={`tbl-toggle-btn ${a.is_available ? 'tbl-toggle-btn--on' : 'tbl-toggle-btn--off'}`}
-                            onClick={() =>
-                              handleToggleApt(
-                                a.id,
-                                'is_available',
-                                a.is_available
-                              )
-                            }
-                            title="Toggle availability"
-                          >
-                            {a.is_available ? <FaToggleOn /> : <FaToggleOff />}
-                            {a.is_available ? ' Live' : ' Hidden'}
-                          </button>
-                        </td>
-                        <td className="tbl-td">
-                          <div
-                            className="tbl-actions"
-                            style={{ display: 'flex', gap: '8px' }}
-                          >
-                            <button
-                              className="tbl-action-btn tbl-action-btn--edit"
-                              style={{
-                                color: '#C9A84C',
-                                background: 'rgba(201,168,76,0.1)',
-                                padding: '6px',
-                              }}
-                              onClick={() => handleEditApt(a)}
-                              title="Edit"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              className="tbl-action-btn tbl-action-btn--delete"
-                              onClick={() => handleDeleteApt(a.id)}
-                              title="Delete"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+                        </tr>
+                      ))
                   )}
                 </tbody>
               </table>
@@ -1484,7 +1613,7 @@ export default function AdminDashboard() {
                     <th className="tbl-th">Field of Study</th>
                     <th className="tbl-th">COMPANY</th>
                     <th className="tbl-th">EXPERIENCE</th>
-                    <th className="tbl-th">MESSAGE</th>
+                    <th className="tbl-th">REASONS FOR JOINING MILEVIA</th>
                     <th className="tbl-th">Passion</th>
                     <th className="tbl-th">About The Partner</th>
                     <th className="tbl-th">APPLIED</th>
@@ -1532,24 +1661,18 @@ export default function AdminDashboard() {
                           <td className="tbl-td">{p.company || '—'}</td>
                           <td className="tbl-td">{p.experience || '—'}</td>
                           <td className="tbl-td">
-                            {p.message ? (
-                              <button
-                                className="tbl-msg-btn"
-                                onClick={() => setSelectedPartner(p)}
-                                title="Read message"
-                              >
-                                <FaComment />{' '}
-                                <span className="tbl-msg-preview">
-                                  {p.message.slice(0, 40)}
-                                  {p.message.length > 40 ? '…' : ''}
-                                </span>
-                              </button>
-                            ) : (
-                              <span className="tbl-td--muted">—</span>
-                            )}
+                            <div className="scroll-text">
+                              {p.message || '—'}
+                            </div>
                           </td>
-                          <td className="tbl-td">{p.passion || '—'}</td>
-                          <td className="tbl-td">{p.about || '—'}</td>
+                          <td className="tbl-td">
+                            <div className="scroll-text">
+                              {p.passion || '—'}
+                            </div>
+                          </td>
+                          <td className="tbl-td">
+                            <div className="scroll-text">{p.about || '—'}</div>
+                          </td>
                           <td className="tbl-td">
                             {new Date(p.created_at).toLocaleDateString()}
                           </td>

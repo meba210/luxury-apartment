@@ -585,6 +585,17 @@
   background: #fff8e8;
 }
 
+.scroll-text {
+  max-height: 120px;      /* Maximum height of the cell */
+  width: 230px;           /* Fixed width */
+  overflow-y: auto;       /* Vertical scrollbar */
+  overflow-x: hidden;     /* Hide horizontal scrollbar */
+
+  white-space: pre-wrap;  /* Preserve paragraphs */
+  word-break: break-word; /* Break long words if needed */
+  line-height: 1.5;
+  padding-right: 5px;
+}
 .tbl-td {
   padding: 13px 16px;
   color: #374151;

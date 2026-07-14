@@ -74,7 +74,7 @@ router.get('/', async (req, res) => {
       SELECT a.*, l.name as location_name, l.description as location_description
       FROM apartments a
       LEFT JOIN locations l ON a.location_id = l.id
-      WHERE a.is_available = TRUE AND a.bedrooms >= 2
+      WHERE a.is_available = 1 AND a.bedrooms >= 2
     `;
     const params = [];
 

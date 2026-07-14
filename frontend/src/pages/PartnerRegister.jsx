@@ -144,8 +144,6 @@ export default function PartnerRegister() {
             Fill in your details to apply. Admin approval required.
           </p>
 
-          {error && <div className="auth-error">{error}</div>}
-
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             <div className="auth-form__row">
               <div className="form-group">
@@ -221,7 +219,7 @@ export default function PartnerRegister() {
             </div>
 
             <div className="auth-form__row">
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label className="form-label">ID Number</label>
                 <input
                   name="id_number"
@@ -230,7 +228,7 @@ export default function PartnerRegister() {
                   className="form-input"
                   placeholder="National ID number"
                 />
-              </div>
+              </div> */}
               <div className="form-group">
                 <label className="form-label">Date of Birth</label>
                 <input
@@ -255,7 +253,7 @@ export default function PartnerRegister() {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Institution</label>
+                <label className="form-label">Institution Name</label>
                 <input
                   name="institution"
                   value={form.institution}
@@ -392,7 +390,7 @@ export default function PartnerRegister() {
                 />
               </div>
             </div>
-
+            {error && <div className="auth-error">{error}</div>}
             <button
               type="submit"
               className="btn btn-gold auth-form__submit"
