@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   FaSignOutAlt,
   FaCheck,
@@ -149,6 +151,7 @@ const BLANK_SALE = {
 // ── Component ─────────────────────────────────────────────────
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem('admin_token');
   const authH = useMemo(
     () => ({ headers: { Authorization: `Bearer ${token}` } }),
@@ -160,7 +163,10 @@ export default function AdminDashboard() {
   }, [token, navigate]);
 
   // ── data ──────────────────────────────────────────────────
-  const [tab, setTab] = useState('apartments');
+ const tab =
+   location.pathname === '/admin/dashboard'
+     ? 'apartments'
+     : location.pathname.split('/').pop();
   const [apartments, setApartments] = useState([]);
   const [partners, setPartners] = useState([]);
   const [sales, setSales] = useState([]);
@@ -647,22 +653,22 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <div className="dashboard__tabs">
-          <button
+          <Link
+            to="/admin/dashboard/apartments"
             className={`dashboard__tab ${tab === 'apartments' ? 'dashboard__tab--active' : ''}`}
-            onClick={() => setTab('apartments')}
           >
             <FaHome /> Live Apartments
             <span className="dashboard__tab-count">{apartments.length}</span>
-          </button>
-          <button
+          </Link>
+          <Link
+            to="/admin/dashboard/post"
             className={`dashboard__tab ${tab === 'post' ? 'dashboard__tab--active' : ''}`}
-            onClick={() => setTab('post')}
           >
             <FaPlus /> Post New Apartment
-          </button>
-          <button
+          </Link>
+          <Link
+            to="/admin/dashboard/partners"
             className={`dashboard__tab ${tab === 'partners' ? 'dashboard__tab--active' : ''}`}
-            onClick={() => setTab('partners')}
           >
             <FaUsers /> Partner Applications
             {stats.pendingPartners > 0 && (
@@ -670,21 +676,23 @@ export default function AdminDashboard() {
                 {stats.pendingPartners}
               </span>
             )}
-          </button>
-          <button
+          </Link>
+
+          <Link
+            to="/admin/dashboard/inquiries"
             className={`dashboard__tab ${tab === 'inquiries' ? 'dashboard__tab--active' : ''}`}
-            onClick={() => setTab('inquiries')}
           >
             <FaComment /> Inquiries
             <span className="dashboard__tab-count">{inquiries.length}</span>
-          </button>
-          <button
+          </Link>
+
+          <Link
+            to="/admin/dashboard/sales"
             className={`dashboard__tab ${tab === 'sales' ? 'dashboard__tab--active' : ''}`}
-            onClick={() => setTab('sales')}
           >
             <FaBuilding /> Sales Records
             <span className="dashboard__tab-count">{sales.length}</span>
-          </button>
+          </Link>
         </div>
 
         {/* ══════════ LIVE APARTMENTS TAB ══════════ */}

@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   FaSignOutAlt,
   FaSearch,
@@ -107,7 +109,8 @@ export default function PartnerDashboard() {
   const [apartments, setApartments] = useState([])
   const [loading, setLoading]   = useState(true)
   const [aptLoading, setAptLoading] = useState(false)
-  const [tab, setTab]           = useState('apartments')
+  
+ const tab = location.pathname.includes('/sales') ? 'sales' : 'apartments';
   const [error, setError]       = useState('')
   const [search, setSearch]     = useState('')
   const [filterStatus, setFilterStatus] = useState('')
@@ -829,20 +832,23 @@ export default function PartnerDashboard() {
       <div className="dashboard__body">
         {/* ── Tabs ── */}
         <div className="dashboard__tabs">
-          <button
-            className={`dashboard__tab ${tab === 'apartments' ? 'dashboard__tab--active' : ''}`}
-            onClick={() => setTab('apartments')}
+          <Link
+            to="/partner/dashboard/apartments"
+            className={`dashboard__tab ${
+              tab === 'apartments' ? 'dashboard__tab--active' : ''
+            }`}
           >
             <FaHome /> Live Apartments
-            <span className="dashboard__tab-count">{apartments.length}</span>
-          </button>
-          <button
-            className={`dashboard__tab ${tab === 'sales' ? 'dashboard__tab--active' : ''}`}
-            onClick={() => setTab('sales')}
+          </Link>
+
+          <Link
+            to="/partner/dashboard/sales"
+            className={`dashboard__tab ${
+              tab === 'sales' ? 'dashboard__tab--active' : ''
+            }`}
           >
             <FaBuilding /> Sales Records
-            <span className="dashboard__tab-count">{sales.length}</span>
-          </button>
+          </Link>
         </div>
 
         {/* ── Stats ── */}

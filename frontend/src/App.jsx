@@ -25,8 +25,31 @@ function App() {
           <Route path="/partner/register" element={<PartnerRegister />} />
           <Route path="/partner/login" element={<PartnerLogin />} />
           <Route path="/partner/dashboard" element={<PartnerDashboard />} />
+          <Route
+            path="/partner/dashboard/apartments"
+            element={<PartnerDashboard />}
+          />
+
+          <Route
+            path="/partner/dashboard/sales"
+            element={<PartnerDashboard />}
+          />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route
+            path="/admin/dashboard/apartments"
+            element={<AdminDashboard />}
+          />
+          <Route path="/admin/dashboard/post" element={<AdminDashboard />} />
+          <Route
+            path="/admin/dashboard/partners"
+            element={<AdminDashboard />}
+          />
+          <Route
+            path="/admin/dashboard/inquiries"
+            element={<AdminDashboard />}
+          />
+          <Route path="/admin/dashboard/sales" element={<AdminDashboard />} />
         </Routes>
       </main>
       <Footer />
