@@ -98,6 +98,13 @@ async function initializeDatabase() {
       );
     }
 
+    const hasVideoLinks = await hasColumn('apartments', 'video_links');
+    if (!hasVideoLinks) {
+      await pool.execute(
+        "ALTER TABLE apartments ADD COLUMN video_links JSON DEFAULT '[]'"
+      );
+    }
+
     await pool.execute(
       "UPDATE apartments SET property_type = CASE WHEN LOWER(title) LIKE '%penthouse%' THEN 'Penthouse' WHEN LOWER(title) LIKE '%duplex%' THEN 'Duplex' ELSE 'Apartment' END WHERE property_type IS NULL OR property_type = ''"
     );
