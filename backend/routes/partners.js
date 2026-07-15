@@ -487,7 +487,6 @@ router.post('/register', async (req, res) => {
       additional_phone,
       telegram_username,
       address,
-      id_number,
       dob,
       education_level,
       institution,
@@ -543,7 +542,7 @@ router.post('/register', async (req, res) => {
          full_name, email, phone, additional_phone, telegram_username, address,
          dob, education_level, institution, field_of_study, company, 
          experience, message, passion, about, password_hash
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
        RETURNING id`,
       [
         full_name,
@@ -552,7 +551,7 @@ router.post('/register', async (req, res) => {
         additional_phone || null,
         telegram_username || null,
         address || null,
-        id_number || null,
+       
         dob || null,
         education_level || null,
         institution || null,
