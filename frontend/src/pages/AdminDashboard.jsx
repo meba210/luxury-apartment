@@ -1606,7 +1606,7 @@ export default function AdminDashboard() {
                     <th className="tbl-th">Additional Phone</th>
                     <th className="tbl-th">Telegram Username</th>
                     <th className="tbl-th">Address</th>
-                    <th className="tbl-th">ID Number</th>
+                   
                     <th className="tbl-th">Date of Birth</th>
                     <th className="tbl-th">Education Level</th>
                     <th className="tbl-th">Institution</th>
@@ -1653,7 +1653,7 @@ export default function AdminDashboard() {
                             {p.telegram_username || '—'}
                           </td>
                           <td className="tbl-td">{p.address || '—'}</td>
-                          <td className="tbl-td">{p.id_number || '—'}</td>
+                         
                           <td className="tbl-td">{p.dob || '—'}</td>
                           <td className="tbl-td">{p.education_level || '—'}</td>
                           <td className="tbl-td">{p.institution || '—'}</td>

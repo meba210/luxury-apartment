@@ -954,6 +954,8 @@ width:170px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   animation: scaleIn 0.2s ease;
+   max-height: 90vh; /* limit height */
+  overflow-y: auto;
 }
 
 .dash-modal__header {
