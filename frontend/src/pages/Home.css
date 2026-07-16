@@ -663,7 +663,7 @@ a.home__contact-detail-value:hover {
 }
 
 .home__contact .form-select option {
-  background: var(--white);
+  background: var(--cream);
   color: var(--cream-text-primary);
 }
 

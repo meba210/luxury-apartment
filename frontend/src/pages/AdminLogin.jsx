@@ -34,12 +34,12 @@ export default function AdminLogin() {
     <div className="auth-page auth-page--centered auth-page--admin">
       <div className="auth-card auth-card--admin">
         <div className="auth-card__header">
-          <div className="auth-card__admin-icon"><FaLock /></div>
+          <div className="auth-card__admin-icon">
+            <FaLock />
+          </div>
           <h2>Admin Portal</h2>
           <p>MILEVIA Estates — Restricted Access</p>
         </div>
-
-        {error && <div className="auth-error">{error}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -47,7 +47,9 @@ export default function AdminLogin() {
             <input
               name="username"
               value={form.username}
-              onChange={e => setForm(p => ({ ...p, username: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, username: e.target.value }))
+              }
               className="form-input"
               placeholder="Enter your username"
               required
@@ -62,26 +64,44 @@ export default function AdminLogin() {
                 name="password"
                 type={showPw ? 'text' : 'password'}
                 value={form.password}
-                onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, password: e.target.value }))
+                }
                 className="form-input"
                 placeholder="Enter your password"
                 required
               />
-              <button type="button" className="auth-form__pw-toggle" onClick={() => setShowPw(p => !p)}>
+              <button
+                type="button"
+                className="auth-form__pw-toggle"
+                onClick={() => setShowPw((p) => !p)}
+              >
                 {showPw ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
           </div>
-
-          <button type="submit" className="btn btn-gold auth-form__submit" disabled={loading}>
-            {loading ? <span className="auth-spinner" /> : <><FaLock /> Sign In</>}
+          {error && <div className="auth-error">{error}</div>}
+          <button
+            type="submit"
+            className="btn btn-gold auth-form__submit"
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="auth-spinner" />
+            ) : (
+              <>
+                <FaLock /> Sign In
+              </>
+            )}
           </button>
         </form>
 
         <div className="auth-card__footer">
-          <p><Link to="/partner/login">← Partner login</Link></p>
+          <p>
+            <Link to="/partner/login">← Partner login</Link>
+          </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

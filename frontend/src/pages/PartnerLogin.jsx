@@ -37,12 +37,9 @@ export default function PartnerLogin() {
     <div className="auth-page auth-page--centered">
       <div className="auth-card">
         <div className="auth-card__header">
-          <Logo size={44} color="#C9A84C" />
           <h2>Partner Login</h2>
           <p>Sign in to access the MILEVIA partner dashboard</p>
         </div>
-
-        {error && <div className="auth-error">{error}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -71,24 +68,45 @@ export default function PartnerLogin() {
                 placeholder="Your password"
                 required
               />
-              <button type="button" className="auth-form__pw-toggle" onClick={() => setShowPw(p => !p)}>
+              <button
+                type="button"
+                className="auth-form__pw-toggle"
+                onClick={() => setShowPw((p) => !p)}
+              >
                 {showPw ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
           </div>
-
-          <button type="submit" className="btn btn-gold auth-form__submit" disabled={loading}>
-            {loading ? <span className="auth-spinner" /> : <><FaSignInAlt /> Sign In</>}
+          {error && <div className="auth-error">{error}</div>}
+          <button
+            type="submit"
+            className="btn btn-gold auth-form__submit"
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="auth-spinner" />
+            ) : (
+              <>
+                <FaSignInAlt /> Sign In
+              </>
+            )}
           </button>
         </form>
 
         <div className="auth-card__footer">
-          <p>Not a partner yet? <Link to="/partner/register">Apply now</Link></p>
+          <p>
+            Not a partner yet? <Link to="/partner/register">Apply now</Link>
+          </p>
           <p style={{ marginTop: '8px' }}>
-            <Link to="/admin/login" style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Admin login →</Link>
+            <Link
+              to="/admin/login"
+              style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}
+            >
+              Admin login →
+            </Link>
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -73,12 +73,6 @@ const apartments = propApartments || [];
 
   return (
     <form className="contact-form" onSubmit={handleSubmit} noValidate>
-      {error && (
-        <div className="contact-form__error">
-          <FaExclamationCircle /> {error}
-        </div>
-      )}
-
       <div className="contact-form__row">
         <div className="form-group">
           <label className="form-label">Full Name *</label>
@@ -125,6 +119,8 @@ const apartments = propApartments || [];
             value={form.apartment_id}
             onChange={handleChange}
             className="form-select"
+            
+           
           >
             <option value="">Select a property (optional)</option>
 
@@ -156,7 +152,11 @@ const apartments = propApartments || [];
           required
         />
       </div>
-
+      {error && (
+        <div className="contact-form__error">
+          <FaExclamationCircle /> {error}
+        </div>
+      )}
       <button
         type="submit"
         className="btn btn-gold btn-lg contact-form__submit"
