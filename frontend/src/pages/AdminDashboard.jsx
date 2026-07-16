@@ -176,6 +176,7 @@ export default function AdminDashboard() {
    location.pathname === '/admin/dashboard'
      ? 'apartments'
      : location.pathname.split('/').pop();
+    
   const [apartments, setApartments] = useState([]);
   const [partners, setPartners] = useState([]);
   const [sales, setSales] = useState([]);
@@ -306,7 +307,8 @@ export default function AdminDashboard() {
     setAptForm({ ...apt });
     setAptError('');
     setAptSuccess('');
-    setTab('post');
+    // setTab('post');
+     navigate('/admin/dashboard/post');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -797,7 +799,10 @@ export default function AdminDashboard() {
               <div className="dashboard__toolbar-right">
                 <button
                   className="dashboard__add-btn"
-                  onClick={() => setTab('post')}
+                  onClick={() => {
+                     setAptSuccess(''); // Clear success message
+                     setAptError(''); 
+                    navigate('/admin/dashboard/post')}}
                 >
                   <FaPlus /> Post New Apartment
                 </button>
@@ -1606,7 +1611,7 @@ export default function AdminDashboard() {
                     <th className="tbl-th">Additional Phone</th>
                     <th className="tbl-th">Telegram Username</th>
                     <th className="tbl-th">Address</th>
-                   
+
                     <th className="tbl-th">Date of Birth</th>
                     <th className="tbl-th">Education Level</th>
                     <th className="tbl-th">Institution</th>
@@ -1653,7 +1658,7 @@ export default function AdminDashboard() {
                             {p.telegram_username || '—'}
                           </td>
                           <td className="tbl-td">{p.address || '—'}</td>
-                         
+
                           <td className="tbl-td">{p.dob || '—'}</td>
                           <td className="tbl-td">{p.education_level || '—'}</td>
                           <td className="tbl-td">{p.institution || '—'}</td>

@@ -11,9 +11,10 @@ import {
 } from 'react-icons/fa';
 import './FilterBar.css';
 
-// Only 2+ bedrooms — live properties for sale only
+
 const bedroomOptions = [
   { value: '', label: 'All Properties' },
+   { value: '1', label: '1 Bedroom Property' },
   { value: '2', label: '2 Bedroom Property' },
   { value: '3', label: '3 Bedroom Property' },
   { value: '4', label: '4+ Bedroom Property' },
