@@ -251,7 +251,10 @@ export default function Home() {
               <span className="overline" style={{ color: 'var(--gold-light)' }}>
                 Join Our Network
               </span>
-              <h2 className="home__partner-title">
+              <h2
+                className="home__partner-title"
+                style={{ color: 'var(--gold-dark)' }}
+              >
                 BECOME A MILEVIA ESTATES PARTNER
               </h2>
               <div className="home__partner-items">
@@ -277,7 +280,7 @@ export default function Home() {
             <div className="home__partner-badge">
               <div className="home__partner-badge-inner">
                 <div className="home__partner-badge-icon">
-                  <Logo size={42} color="#C9A84C" />
+                  <Logo />
                 </div>
                 <p className="home__partner-badge-text">GROW TOGETHER,</p>
                 <p className="home__partner-badge-text home__partner-badge-text--gold">
