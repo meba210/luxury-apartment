@@ -1,9 +1,8 @@
-
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; // ✅ FIXED: Added useLocation (same as AdminDashboard)
+import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+// Removed duplicate useLocation import (same as AdminDashboard)
 import {
   FaSignOutAlt,
   FaSearch,
@@ -31,25 +30,25 @@ import {
   FaEyeSlash,
   FaBell,
 } from 'react-icons/fa';
-import Logo from '../components/Logo'
-import './Dashboard.css'
+import Logo from '../components/Logo';
+import './Dashboard.css';
 
 const STATUS_COLORS = {
-  active:       { bg: '#E6F9EE', color: '#1A7A3C', label: 'Active' },
-  sold:         { bg: '#FEE2E2', color: '#B91C1C', label: 'Sold' },
-  pending:      { bg: '#FEF3C7', color: '#92400E', label: 'Pending' },
+  active: { bg: '#E6F9EE', color: '#1A7A3C', label: 'Active' },
+  sold: { bg: '#FEE2E2', color: '#B91C1C', label: 'Sold' },
+  pending: { bg: '#FEF3C7', color: '#92400E', label: 'Pending' },
   'off-market': { bg: '#F3F4F6', color: '#374151', label: 'Off Market' },
-}
+};
 
-const PROPERTY_TYPES = ['Apartment','Duplex','Penthouse']
+const PROPERTY_TYPES = ['Apartment', 'Duplex', 'Penthouse'];
 
 function fmt(n) {
-  if (!n && n !== 0) return '—'
-  return new Intl.NumberFormat('en-ET').format(n)
+  if (!n && n !== 0) return '—';
+  return new Intl.NumberFormat('en-ET').format(n);
 }
 
 function getVideoLinks(apt) {
-  const value = apt?.video_links ?? apt?.videoLinks ?? apt?.videos ?? []
+  const value = apt?.video_links ?? apt?.videoLinks ?? apt?.videos ?? [];
   const cleanLinks = (links) =>
     links
       .map((url) =>
@@ -57,27 +56,29 @@ function getVideoLinks(apt) {
           .trim()
           .replace(/^[\s[\]"']+|[\s[\]"']+$/g, '')
       )
-      .filter((url) => /^https?:\/\//i.test(url))
+      .filter((url) => /^https?:\/\//i.test(url));
 
-  if (Array.isArray(value)) return cleanLinks(value)
-  if (typeof value !== 'string') return []
+  if (Array.isArray(value)) return cleanLinks(value);
+  if (typeof value !== 'string') return [];
 
   try {
-    const parsed = JSON.parse(value)
-    if (Array.isArray(parsed)) return cleanLinks(parsed)
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return cleanLinks(parsed);
   } catch {
- 
     // Fall back to a plain URL or comma-separated text saved by older data.
   }
 
-  return cleanLinks(value.split(','))
+  return cleanLinks(value.split(','));
 }
 
 function SortIcon({ col, sortCol, sortDir }) {
-  if (sortCol !== col) return <FaSort className="tbl-sort-icon tbl-sort-icon--inactive" />
-  return sortDir === 'asc'
-    ? <FaSortUp   className="tbl-sort-icon tbl-sort-icon--active" />
-    : <FaSortDown className="tbl-sort-icon tbl-sort-icon--active" />
+  if (sortCol !== col)
+    return <FaSort className="tbl-sort-icon tbl-sort-icon--inactive" />;
+  return sortDir === 'asc' ? (
+    <FaSortUp className="tbl-sort-icon tbl-sort-icon--active" />
+  ) : (
+    <FaSortDown className="tbl-sort-icon tbl-sort-icon--active" />
+  );
 }
 
 const fallbackLocations = [
@@ -104,61 +105,43 @@ const fallbackLocations = [
 ];
 
 export default function PartnerDashboard() {
-  const navigate = useNavigate()
-  const [partner, setPartner]   = useState(null)
-  const [sales, setSales]       = useState([])
-  const [apartments, setApartments] = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [aptLoading, setAptLoading] = useState(false)
-  
- const tab = location.pathname.includes('/sales') ? 'sales' : 'apartments';
-  const [error, setError]       = useState('')
-  const [search, setSearch]     = useState('')
-  const [filterStatus, setFilterStatus] = useState('')
-  const [filterType, setFilterType]     = useState('')
+  const navigate = useNavigate();
+  const location = useLocation(); // ✅ FIXED: Added useLocation (EXACT same as AdminDashboard)
+  const [partner, setPartner] = useState(null);
+  const [sales, setSales] = useState([]);
+  const [apartments, setApartments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [aptLoading, setAptLoading] = useState(false);
+
+  // ✅ FIXED: Tab detection EXACT same as AdminDashboard
+  const tab =
+    location.pathname === '/partner/dashboard'
+      ? 'apartments'
+      : location.pathname.split('/').pop();
+
+  const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterType, setFilterType] = useState('');
   const [filterBedrooms, setFilterBedrooms] = useState('');
-  const [sortCol, setSortCol]   = useState('created_at')
-  const [sortDir, setSortDir]   = useState('desc')
+  const [sortCol, setSortCol] = useState('created_at');
+  const [sortDir, setSortDir] = useState('desc');
   const [local, setLocal] = useState({
     location_id: '',
     location_name: '',
   });
 
+  // ✅ EXACT same as AdminDashboard - token and auth headers
+  const token = localStorage.getItem('partner_token');
+  const authH = useMemo(
+    () => ({ headers: { Authorization: `Bearer ${token}` } }),
+    [token]
+  );
 
- const handleAuthError = useCallback(
-   (err) => {
-     if (err.response?.status === 401 || err.response?.status === 403) {
-       localStorage.removeItem('partner_token');
-       localStorage.removeItem('partner_info');
-       navigate('/partner/login');
-     }
-   },
-   [navigate]
- );
-
-  const token = localStorage.getItem('partner_token')
-
-//   useEffect(() => {
-//   const interceptor = axios.interceptors.response.use(
-//     response => response,
-//     error => {
-//       if (
-//         error.response?.status === 401 ||
-//         error.response?.status === 403
-//       ) {
-//         localStorage.removeItem('partner_token');
-//         localStorage.removeItem('partner_info');
-//         navigate('/partner/login');
-//       }
-
-//       return Promise.reject(error);
-//     }
-//   );
-
-//   return () => {
-//     axios.interceptors.response.eject(interceptor);
-//   };
-// }, [navigate]);
+  // ✅ EXACT same as AdminDashboard - auth guard
+  useEffect(() => {
+    if (!token) navigate('/partner/login');
+  }, [token, navigate]);
 
   const [locations, setLocations] = useState(fallbackLocations);
 
@@ -166,15 +149,20 @@ export default function PartnerDashboard() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  
+
   // ── Profile state ──
-  const [profileData, setProfileData]       = useState(null)
-  const [profileLoading, setProfileLoading] = useState(false)
-  
+  const [profileData, setProfileData] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+
   // ── Edit Profile Form ──
   const [editForm, setEditForm] = useState({
-    full_name: '', phone: '', additional_phone: '',
-    telegram_username: '', address: '', company: '', about: '',
+    full_name: '',
+    phone: '',
+    additional_phone: '',
+    telegram_username: '',
+    address: '',
+    company: '',
+    about: '',
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
@@ -186,21 +174,24 @@ export default function PartnerDashboard() {
     new_password: '',
     confirm_password: '',
   });
-  const [showPassword, setShowPassword] = useState({ current: false, new: false, confirm: false });
+  const [showPassword, setShowPassword] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
   const [passwordLoading, setPasswordLoading] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
-
-  // ── Auth guard ──
-  useEffect(() => {
-    if (!token) { navigate('/partner/login'); return }
-    const info = localStorage.getItem('partner_info')
-    if (info) setPartner(JSON.parse(info))
-  }, [token, navigate])
+  const [passwordMessage, setPasswordMessage] = useState({
+    type: '',
+    text: '',
+  });
 
   // ── Close dropdown when clicking outside ──
   useEffect(() => {
     function handleClickOutside(event) {
-      if (showProfileDropdown && !event.target.closest('.dashboard__profile-dropdown')) {
+      if (
+        showProfileDropdown &&
+        !event.target.closest('.dashboard__profile-dropdown')
+      ) {
         setShowProfileDropdown(false);
       }
     }
@@ -220,17 +211,14 @@ export default function PartnerDashboard() {
       .catch(() => setLocations(fallbackLocations));
   }, []);
 
+  // ✅ EXACT same as AdminDashboard - fetchProfile
   const fetchProfile = useCallback(async () => {
     if (!token) return;
     setProfileLoading(true);
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/partners/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        authH
       );
       setProfileData(res.data.data);
       setEditForm({
@@ -243,37 +231,51 @@ export default function PartnerDashboard() {
         about: res.data.data.about || '',
       });
     } catch (err) {
-      console.log(err);
-        handleAuthError(err);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem('partner_token');
+        localStorage.removeItem('partner_info');
+        navigate('/partner/login');
+      }
     } finally {
       setProfileLoading(false);
     }
-  }, [token, handleAuthError]);
+  }, [token, authH, navigate]);
 
   // ── Save Profile ──
   const saveProfileChanges = async () => {
     if (!editForm.full_name || !editForm.phone) {
-      setEditMessage({ type: 'error', text: 'Full name and phone are required.' });
+      setEditMessage({
+        type: 'error',
+        text: 'Full name and phone are required.',
+      });
       return;
     }
-    
+
     setEditSaving(true);
     try {
       await axios.put(
         `${import.meta.env.VITE_API_URL}/api/partners/me`,
         editForm,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        authH
       );
-      setEditMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setEditMessage({
+        type: 'success',
+        text: 'Profile updated successfully!',
+      });
       setIsEditing(false);
       setShowEditProfile(false);
       fetchProfile();
       setTimeout(() => setEditMessage({ type: '', text: '' }), 3000);
     } catch (err) {
-        handleAuthError(err);
-      setEditMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem('partner_token');
+        localStorage.removeItem('partner_info');
+        navigate('/partner/login');
+      }
+      setEditMessage({
+        type: 'error',
+        text: 'Failed to update profile. Please try again.',
+      });
     } finally {
       setEditSaving(false);
     }
@@ -281,16 +283,29 @@ export default function PartnerDashboard() {
 
   // ── Change Password ──
   const handlePasswordChange = async () => {
-    if (!passwordForm.current_password || !passwordForm.new_password || !passwordForm.confirm_password) {
-      setPasswordMessage({ type: 'error', text: 'All password fields are required.' });
+    if (
+      !passwordForm.current_password ||
+      !passwordForm.new_password ||
+      !passwordForm.confirm_password
+    ) {
+      setPasswordMessage({
+        type: 'error',
+        text: 'All password fields are required.',
+      });
       return;
     }
     if (passwordForm.new_password.length < 6) {
-      setPasswordMessage({ type: 'error', text: 'New password must be at least 6 characters.' });
+      setPasswordMessage({
+        type: 'error',
+        text: 'New password must be at least 6 characters.',
+      });
       return;
     }
     if (passwordForm.new_password !== passwordForm.confirm_password) {
-      setPasswordMessage({ type: 'error', text: 'New passwords do not match.' });
+      setPasswordMessage({
+        type: 'error',
+        text: 'New passwords do not match.',
+      });
       return;
     }
 
@@ -299,25 +314,38 @@ export default function PartnerDashboard() {
       await axios.put(
         `${import.meta.env.VITE_API_URL}/api/partners/me/password`,
         passwordForm,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        authH
       );
-      setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
-      setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
+      setPasswordMessage({
+        type: 'success',
+        text: 'Password changed successfully!',
+      });
+      setPasswordForm({
+        current_password: '',
+        new_password: '',
+        confirm_password: '',
+      });
       setTimeout(() => {
         setPasswordMessage({ type: '', text: '' });
         setShowPasswordModal(false);
       }, 2000);
     } catch (err) {
-        handleAuthError(err);
-      setPasswordMessage({ type: 'error', text: err.response?.data?.message || 'Failed to change password.' });
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem('partner_token');
+        localStorage.removeItem('partner_info');
+        navigate('/partner/login');
+      }
+      setPasswordMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to change password.',
+      });
     } finally {
       setPasswordLoading(false);
     }
   };
 
   // ── Fetch sales ──
+  // ✅ EXACT same as AdminDashboard - fetchApartments
   const fetchApartments = useCallback(async () => {
     setAptLoading(true);
     try {
@@ -326,13 +354,18 @@ export default function PartnerDashboard() {
       );
       setApartments(res.data.data || []);
     } catch (err) {
-      handleAuthError(err);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem('partner_token');
+        localStorage.removeItem('partner_info');
+        navigate('/partner/login');
+      }
       console.error('Failed to fetch live apartments', err);
     } finally {
       setAptLoading(false);
     }
-  }, [handleAuthError]);
+  }, [navigate]);
 
+  // ✅ EXACT same as AdminDashboard - fetchSales with authH
   const fetchSales = useCallback(async () => {
     if (!token) return;
     setLoading(true);
@@ -347,15 +380,13 @@ export default function PartnerDashboard() {
 
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/partners/sales?${params}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        authH
       );
       setSales(res.data.data || []);
     } catch (err) {
-      handleAuthError(err);
       if (err.response?.status === 401 || err.response?.status === 403) {
         localStorage.removeItem('partner_token');
+        localStorage.removeItem('partner_info');
         navigate('/partner/login');
       } else {
         setError('Failed to load properties. Please refresh.');
@@ -371,62 +402,90 @@ export default function PartnerDashboard() {
     sortCol,
     sortDir,
     navigate,
-    handleAuthError,
+    authH,
   ]);
 
+  // ✅ EXACT same as AdminDashboard - useEffect with fetchAll pattern
   useEffect(() => {
     fetchSales();
     fetchApartments();
     fetchProfile();
   }, [fetchSales, fetchApartments, fetchProfile]);
 
-  const handleSort = col => {
-    if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
-    else { setSortCol(col); setSortDir('asc') }
-  }
+  const handleSort = (col) => {
+    if (sortCol === col) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    else {
+      setSortCol(col);
+      setSortDir('asc');
+    }
+  };
 
- const clearFilters = () => {
-   setSearch('');
-   setFilterStatus('');
-   setFilterType('');
-   setFilterBedrooms('');
-   setLocal({
-     location_name: '',
-   });
- };
-  const hasFilters = search || filterStatus || filterType
+  const clearFilters = () => {
+    setSearch('');
+    setFilterStatus('');
+    setFilterType('');
+    setFilterBedrooms('');
+    setLocal({
+      location_name: '',
+    });
+  };
+
+  const hasFilters = search || filterStatus || filterType;
 
   const exportCSV = () => {
-    const headers = ['Place','Property Type','Status','Price (ETB)','Area (sqm)','Per sqm (Birr)','Bedrooms','Bathrooms','Floor','Agent']
-    const rows = sales.map(s => [
-      s.place, s.property_type, s.listing_status,
-      s.price_etb, s.area_sqm, s.per_sqm_birr,
-      s.bedrooms || '', s.bathrooms || '', s.floor || '', s.agent_name || ''
-    ])
-    const csv  = [headers, ...rows].map(r => r.join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
-    a.href = url
-    a.download = `milevia_properties_${new Date().toISOString().slice(0, 10)}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+    const headers = [
+      'Place',
+      'Property Type',
+      'Status',
+      'Price (ETB)',
+      'Area (sqm)',
+      'Per sqm (Birr)',
+      'Bedrooms',
+      'Bathrooms',
+      'Floor',
+      'Agent',
+    ];
+    const rows = sales.map((s) => [
+      s.place,
+      s.property_type,
+      s.listing_status,
+      s.price_etb,
+      s.area_sqm,
+      s.per_sqm_birr,
+      s.bedrooms || '',
+      s.bathrooms || '',
+      s.floor || '',
+      s.agent_name || '',
+    ]);
+    const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `milevia_properties_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('partner_token')
-    localStorage.removeItem('partner_info')
-    navigate('/partner/login')
-  }
+    localStorage.removeItem('partner_token');
+    localStorage.removeItem('partner_info');
+    navigate('/partner/login');
+  };
 
-  const stats = useMemo(() => ({
-    total:    sales.length,
-    active:   sales.filter(s => s.listing_status === 'active').length,
-    sold:     sales.filter(s => s.listing_status === 'sold').length,
-    avgPrice: sales.length
-      ? Math.round(sales.reduce((a, s) => a + Number(s.price_etb), 0) / sales.length)
-      : 0,
-  }), [sales])
+  const stats = useMemo(
+    () => ({
+      total: sales.length,
+      active: sales.filter((s) => s.listing_status === 'active').length,
+      sold: sales.filter((s) => s.listing_status === 'sold').length,
+      avgPrice: sales.length
+        ? Math.round(
+            sales.reduce((a, s) => a + Number(s.price_etb), 0) / sales.length
+          )
+        : 0,
+    }),
+    [sales]
+  );
 
   return (
     <div className="dashboard">
