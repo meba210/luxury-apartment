@@ -66,6 +66,7 @@ function getVideoLinks(apt) {
     const parsed = JSON.parse(value)
     if (Array.isArray(parsed)) return cleanLinks(parsed)
   } catch {
+ 
     // Fall back to a plain URL or comma-separated text saved by older data.
   }
 
@@ -122,7 +123,43 @@ export default function PartnerDashboard() {
     location_id: '',
     location_name: '',
   });
+
+
+ const handleAuthError = useCallback(
+   (err) => {
+     if (err.response?.status === 401 || err.response?.status === 403) {
+       localStorage.removeItem('partner_token');
+       localStorage.removeItem('partner_info');
+       navigate('/partner/login');
+     }
+   },
+   [navigate]
+ );
+
   const token = localStorage.getItem('partner_token')
+
+//   useEffect(() => {
+//   const interceptor = axios.interceptors.response.use(
+//     response => response,
+//     error => {
+//       if (
+//         error.response?.status === 401 ||
+//         error.response?.status === 403
+//       ) {
+//         localStorage.removeItem('partner_token');
+//         localStorage.removeItem('partner_info');
+//         navigate('/partner/login');
+//       }
+
+//       return Promise.reject(error);
+//     }
+//   );
+
+//   return () => {
+//     axios.interceptors.response.eject(interceptor);
+//   };
+// }, [navigate]);
+
   const [locations, setLocations] = useState(fallbackLocations);
 
   // ── Profile Dropdown State ──
@@ -207,10 +244,11 @@ export default function PartnerDashboard() {
       });
     } catch (err) {
       console.log(err);
+        handleAuthError(err);
     } finally {
       setProfileLoading(false);
     }
-  }, [token]);
+  }, [token, handleAuthError]);
 
   // ── Save Profile ──
   const saveProfileChanges = async () => {
@@ -234,6 +272,7 @@ export default function PartnerDashboard() {
       fetchProfile();
       setTimeout(() => setEditMessage({ type: '', text: '' }), 3000);
     } catch (err) {
+        handleAuthError(err);
       setEditMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
     } finally {
       setEditSaving(false);
@@ -271,6 +310,7 @@ export default function PartnerDashboard() {
         setShowPasswordModal(false);
       }, 2000);
     } catch (err) {
+        handleAuthError(err);
       setPasswordMessage({ type: 'error', text: err.response?.data?.message || 'Failed to change password.' });
     } finally {
       setPasswordLoading(false);
@@ -279,28 +319,31 @@ export default function PartnerDashboard() {
 
   // ── Fetch sales ──
   const fetchApartments = useCallback(async () => {
-    setAptLoading(true)
+    setAptLoading(true);
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/apartments`);
-      setApartments(res.data.data || [])
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/apartments`
+      );
+      setApartments(res.data.data || []);
     } catch (err) {
-      console.error('Failed to fetch live apartments', err)
+      handleAuthError(err);
+      console.error('Failed to fetch live apartments', err);
     } finally {
-      setAptLoading(false)
+      setAptLoading(false);
     }
-  }, [])
+  }, [handleAuthError]);
 
   const fetchSales = useCallback(async () => {
-    if (!token) return
-    setLoading(true)
-    setError('')
+    if (!token) return;
+    setLoading(true);
+    setError('');
     try {
-      const params = new URLSearchParams()
-      if (search) params.set('search', search)
-      if (filterStatus) params.set('status', filterStatus)
-      if (filterType) params.set('type', filterType)
-      params.set('sort', sortCol)
-      params.set('order', sortDir)
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (filterStatus) params.set('status', filterStatus);
+      if (filterType) params.set('type', filterType);
+      params.set('sort', sortCol);
+      params.set('order', sortDir);
 
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/partners/sales?${params}`,
@@ -308,18 +351,28 @@ export default function PartnerDashboard() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setSales(res.data.data || [])
+      setSales(res.data.data || []);
     } catch (err) {
+      handleAuthError(err);
       if (err.response?.status === 401 || err.response?.status === 403) {
-        localStorage.removeItem('partner_token')
-        navigate('/partner/login')
+        localStorage.removeItem('partner_token');
+        navigate('/partner/login');
       } else {
-        setError('Failed to load properties. Please refresh.')
+        setError('Failed to load properties. Please refresh.');
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [token, search, filterStatus, filterType, sortCol, sortDir, navigate])
+  }, [
+    token,
+    search,
+    filterStatus,
+    filterType,
+    sortCol,
+    sortDir,
+    navigate,
+    handleAuthError,
+  ]);
 
   useEffect(() => {
     fetchSales();

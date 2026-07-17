@@ -209,6 +209,7 @@ export default function AdminDashboard() {
   const [aptVideoInput, setAptVideoInput] = useState('');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
 
+  const newInquiries = inquiries.filter((i) => i.status === 'new').length;
 
    const clearFilters = () => {
      setSearch('');
@@ -609,6 +610,7 @@ export default function AdminDashboard() {
     pendingPartners: partners.filter((p) => p.status === 'pending').length,
     approved: partners.filter((p) => p.status === 'approved').length,
     sales: sales.length,
+    newInquiries: inquiries.filter((i) => i.status === 'New').length,
     inquiries: inquiries.length,
   };
 
@@ -699,6 +701,7 @@ export default function AdminDashboard() {
                 {stats.pendingPartners}
               </span>
             )}
+            <span className="dashboard__tab-count">{partners.length}</span>
           </Link>
 
           <Link
@@ -706,7 +709,12 @@ export default function AdminDashboard() {
             className={`dashboard__tab ${tab === 'inquiries' ? 'dashboard__tab--active' : ''}`}
           >
             <FaComment /> Inquiries
-            <span className="dashboard__tab-count">{inquiries.length}</span>
+            {newInquiries > 0 && (
+              <span className="dashboard__tab-badge">New={newInquiries}</span>
+            )}
+
+
+            <span className="dashboard__tab-count">Total={inquiries.length}</span>
           </Link>
 
           <Link
@@ -800,9 +808,10 @@ export default function AdminDashboard() {
                 <button
                   className="dashboard__add-btn"
                   onClick={() => {
-                     setAptSuccess(''); // Clear success message
-                     setAptError(''); 
-                    navigate('/admin/dashboard/post')}}
+                    setAptSuccess(''); // Clear success message
+                    setAptError('');
+                    navigate('/admin/dashboard/post');
+                  }}
                 >
                   <FaPlus /> Post New Apartment
                 </button>

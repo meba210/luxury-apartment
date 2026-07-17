@@ -410,7 +410,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'milevia_secret_2024';
+const JWT_SECRET =
+  process.env.JWT_SECRET || 'milevia_jwt_secret_change_in_production';
 
 async function hasColumn(tableName, columnName) {
   try {

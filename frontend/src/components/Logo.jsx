@@ -3,7 +3,7 @@ import logo from '../assets/logo.png';
 
 export default function Logo({ color = 'currentColor', className = '' }) {
   return (
-    <img src={logo} alt="Milevia" width={100} height={100} />
+    <img src={logo} alt="Milevia" width={80} height={80} />
     // <svg
     //   viewBox="0 0 44 44"
     //   fill="none"
