@@ -25,13 +25,15 @@ app.use(
       'http://localhost:5173',
       'http://localhost:3000',
       'https://milevia-estates.vercel.app',
+       'https://mileviaestates.com',
+    'https://www.mileviaestates.com',
     ],
     credentials: true,
   })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors(corsOptions));
+
 
 // Serve uploaded files as static assets
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -46,7 +48,7 @@ app.use('/api/uploads', uploadsRouter);
 app.use('/api/ratings', ratingsRouter);
 
 
-app.options('*', cors(corsOptions));
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({
